@@ -85,12 +85,23 @@ label {
   margin-bottom: 0.4rem;
 }
 
-input {
+input,
+select {
   width: 100%;
   padding: 0.75rem 0.85rem;
   border: 1px solid #b8c7d9;
   border-radius: 12px;
   font: inherit;
+  background: #fff;
+  color: var(--text);
+}
+
+input:disabled,
+select:disabled {
+  background: #e9eef5;
+  color: #6b7280;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 .button-row {
@@ -201,7 +212,7 @@ button:hover {
 
 .left-signer-title {
   left: 28.5%;
-  top: 91.0%;
+  top: 91%;
   transform: translateX(-50%);
   font-size: clamp(10px, 1.2vw, 15px);
   color: #222;
@@ -217,7 +228,7 @@ button:hover {
 
 .right-signer-title {
   left: 73.2%;
-  top: 91.0%;
+  top: 91%;
   transform: translateX(-50%);
   font-size: clamp(10px, 1.2vw, 15px);
   color: #222;
