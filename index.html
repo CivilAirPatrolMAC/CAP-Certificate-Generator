@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CAP Promotion Certificate Generator</title>
+  <title>CAP Certificate Generator</title>
+
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- PDF LIB -->
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 </head>
 <body>
 
@@ -13,102 +17,48 @@
   <header class="page-header">
     <div class="page-header__inner">
       <p class="eyebrow">Civil Air Patrol • Brand Tools</p>
-      <h1>Promotion Certificate Generator</h1>
-      <p class="lede">Create printable cadet promotion certificates.</p>
+      <h1>Achievement Certificate Generator</h1>
     </div>
   </header>
 
   <section class="layout">
 
-    <!-- LEFT -->
-    <div class="controls-column">
+    <div class="controls-column card">
 
-      <article class="card">
-        <h2>Certificate Guidance</h2>
-        <div class="callout">
-          <strong>Before you generate</strong>
-          <ul>
-            <li>Verify cadet name, grade, and date</li>
-            <li>Confirm wording and signatures</li>
-            <li>Review layout before printing</li>
-          </ul>
-        </div>
-      </article>
+      <h2>Details</h2>
 
-      <article class="card">
-        <h2>Details</h2>
+      <label>Achievement</label>
+      <input id="achievementNumber" value="ACHIEVEMENT 7">
 
-        <label>Cadet Name</label>
-        <input id="cadetName" type="text" />
+      <label>Achievement Title</label>
+      <input id="achievementTitle" value="Dr. Robert Goddard">
 
-        <label>Rank</label>
-        <select id="cadetRank"></select>
+      <label>Cadet Name</label>
+      <input id="cadetName" value="Hanniah Beacham">
 
-        <label>Date</label>
-        <input id="promotionDate" type="date" />
+      <label>Cadet Rank</label>
+      <input id="cadetRank" value="CADET CHIEF MASTER SERGEANT">
 
-        <label>Unit</label>
-        <input id="unitName" type="text" />
+      <label>Date</label>
+      <input id="promotionDate" type="date">
 
-        <label>Commander Name</label>
-        <input id="commanderName" type="text" />
+      <label>Unit Line</label>
+      <input id="unitLine" value="Fort Worth Composite Squadron, Fort Worth, Texas">
 
-        <label>Commander Title</label>
-        <input id="commanderTitle" type="text" />
+      <label>Left Signature Name</label>
+      <input id="leftSignerName" value="Roman Vitanza">
 
-      </article>
+      <label>Left Signature Title</label>
+      <input id="leftSignerTitle" value="Squadron Commander">
 
-    </div>
+      <label>Right Signature Name</label>
+      <input id="rightSignerName" value="Joshua Bouldin">
 
-    <!-- RIGHT -->
-    <div class="preview-column">
-      <div class="card">
+      <label>Right Signature Title</label>
+      <input id="rightSignerTitle" value="Deputy Commander for Cadets">
 
-        <h2>Live Preview</h2>
+      <button id="downloadBtn">Download PDF</button>
 
-        <div class="preview-surface">
-
-          <div class="certificate">
-
-            <div class="certificate-inner">
-
-              <div class="org">
-                Civil Air Patrol • United States Air Force Auxiliary
-              </div>
-
-              <h2 class="title">Certificate of Promotion</h2>
-
-              <p>This certifies that</p>
-
-              <div class="name" id="previewName"></div>
-
-              <p>has been promoted to</p>
-
-              <div class="rank" id="previewRank"></div>
-
-              <p id="previewDate"></p>
-              <p id="previewUnit"></p>
-
-              <div class="signatures">
-                <div>
-                  <div class="line"></div>
-                  <div id="previewCommander"></div>
-                </div>
-                <div>
-                  <div class="line"></div>
-                  <div>Date of Presentation</div>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-          <button id="printButton">Print / Save PDF</button>
-
-        </div>
-
-      </div>
     </div>
 
   </section>
