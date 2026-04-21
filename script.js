@@ -111,20 +111,34 @@ async function generatePDF() {
     });
   }
 
+  /* ---------- MAIN TEXT ---------- */
+
   drawCentered(achievementNumber, 0.245, 26, bold, blue);
   drawCentered(achievementTitle, 0.342, 20, bold, blue);
   drawCentered(cadetName, 0.447, 28, serif, black);
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
+  // PDF-only vertical positioning for these two lines
+  const baseY = 0.66;
+  const lineSpacing = 0.035;
+
   drawCentered(
     `Proudly Presented on this ${formatDate(promotionDate)}`,
-    0.683,
+    baseY,
     12,
     bold,
     black
   );
 
-  drawCentered(unitLine, 0.722, 12, bold, black);
+  drawCentered(
+    unitLine,
+    baseY + lineSpacing,
+    12,
+    bold,
+    black
+  );
+
+  /* ---------- SIGNATURES ---------- */
 
   const leftSignatureCenter = 0.285;
   const rightSignatureCenter = 0.695;
@@ -134,6 +148,8 @@ async function generatePDF() {
 
   drawCenteredAt(rightSignerName, rightSignatureCenter, 0.878, 12, font);
   drawCenteredAt(rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
+
+  /* ---------- SAVE ---------- */
 
   const finalBytes = await pdfDoc.save();
 
