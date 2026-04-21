@@ -28,15 +28,19 @@ function formatDate(value) {
   return `${ordinal(day)} Day of ${month} ${year}`;
 }
 
-function syncAchievementTitle() {
+function syncAchievementFields() {
   const achievementSelect = document.getElementById("achievementNumber");
   const titleInput = document.getElementById("achievementTitle");
+  const rankInput = document.getElementById("cadetRank");
 
   const selectedOption = achievementSelect.options[achievementSelect.selectedIndex];
   const title = selectedOption.dataset.title || "";
+  const rank = selectedOption.dataset.rank || "";
 
   titleInput.value = title;
   titleInput.disabled = !title;
+
+  rankInput.value = rank;
 }
 
 /* ------------------ PREVIEW ------------------ */
@@ -45,7 +49,7 @@ function updatePreview() {
   const achievementNumber = getValue("achievementNumber", "ACHIEVEMENT 7");
   const achievementTitle = getValue("achievementTitle", "Dr. Robert Goddard");
   const cadetName = getValue("cadetName", "Hanniah Beacham");
-  const cadetRank = getValue("cadetRank", "CADET CHIEF MASTER SERGEANT");
+  const cadetRank = getValue("cadetRank", "Cadet Senior Master Sergeant");
   const promotionDate = getValue("promotionDate");
   const unitLine = getValue("unitLine", "Fort Worth Composite Squadron, Fort Worth, Texas");
   const leftSignerName = getValue("leftSignerName", "Roman Vitanza");
@@ -72,7 +76,7 @@ async function generatePDF() {
   const achievementNumber = getValue("achievementNumber", "ACHIEVEMENT 7");
   const achievementTitle = getValue("achievementTitle", "Dr. Robert Goddard");
   const cadetName = getValue("cadetName", "Hanniah Beacham");
-  const cadetRank = getValue("cadetRank", "CADET CHIEF MASTER SERGEANT");
+  const cadetRank = getValue("cadetRank", "Cadet Senior Master Sergeant");
   const promotionDate = getValue("promotionDate");
   const unitLine = getValue("unitLine", "Fort Worth Composite Squadron, Fort Worth, Texas");
   const leftSignerName = getValue("leftSignerName", "Roman Vitanza");
@@ -122,8 +126,6 @@ async function generatePDF() {
     });
   }
 
-  /* ---------- MAIN TEXT ---------- */
-
   drawCentered(achievementNumber, 0.245, 26, bold, blue);
   drawCentered(achievementTitle, 0.342, 20, bold, blue);
   drawCentered(cadetName, 0.447, 28, serif, black);
@@ -148,8 +150,6 @@ async function generatePDF() {
     black
   );
 
-  /* ---------- SIGNATURES ---------- */
-
   const leftSignatureCenter = 0.285;
   const rightSignatureCenter = 0.695;
 
@@ -158,8 +158,6 @@ async function generatePDF() {
 
   drawCenteredAt(rightSignerName, rightSignatureCenter, 0.878, 12, font);
   drawCenteredAt(rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
-
-  /* ---------- SAVE ---------- */
 
   const finalBytes = await pdfDoc.save();
 
@@ -179,14 +177,14 @@ async function generatePDF() {
 document.querySelectorAll("input, select").forEach((el) => {
   el.addEventListener("input", () => {
     if (el.id === "achievementNumber") {
-      syncAchievementTitle();
+      syncAchievementFields();
     }
     updatePreview();
   });
 
   el.addEventListener("change", () => {
     if (el.id === "achievementNumber") {
-      syncAchievementTitle();
+      syncAchievementFields();
     }
     updatePreview();
   });
@@ -199,5 +197,5 @@ if (!document.getElementById("promotionDate").value) {
     new Date().toISOString().slice(0, 10);
 }
 
-syncAchievementTitle();
+syncAchievementFields();
 updatePreview();
