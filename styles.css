@@ -1,51 +1,29 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f4f7fb;
-}
-
-header {
-  background: #0f4c81;
-  color: white;
-  padding: 1rem;
-}
-
-.container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.card {
-  background: white;
-  padding: 1rem;
-  border-radius: 10px;
-}
-
-input, select {
-  width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.25rem;
-  margin-bottom: 0.75rem;
-}
-
-button {
-  padding: 0.5rem 1rem;
-  background: #0f4c81;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #0b3559;
-}
-
+/* Certificate-specific styling */
 .certificate {
-  border: 6px solid gold;
+  aspect-ratio: 11 / 8.5;
+  background: #fff;
+  border: 10px solid #d5b15b;
   padding: 2rem;
+  display: grid;
+  place-items: center;
+}
+
+.certificate__inner {
   text-align: center;
-  background: white;
+}
+
+.certificate__title {
+  font-family: Georgia, serif;
+  color: #8b6a2b;
+}
+
+.certificate__name {
+  font-size: 2rem;
+  border-bottom: 2px solid rgba(15,76,129,0.4);
+  margin: 1rem 0;
+}
+
+.certificate__rank {
+  color: var(--brand);
+  font-weight: bold;
 }
