@@ -1,143 +1,43 @@
-:root {
-  --brand: #0f4c81;
-  --brand-dark: #0b3559;
-  --bg: #f4f7fb;
-  --surface: #ffffff;
-  --text: #12263a;
-}
-
 body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  background: #f4f7fb;
 }
 
 .app-shell {
-  max-width: 1300px;
+  max-width: 900px;
   margin: auto;
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .page-header__inner {
-  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  background: linear-gradient(135deg, #0f4c81, #0b3559);
   color: white;
   padding: 1.5rem;
-  border-radius: 20px;
+  border-radius: 16px;
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
 .card {
-  background: var(--surface);
-  padding: 1.25rem;
+  background: white;
+  padding: 1.5rem;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
-input, select {
+input {
   width: 100%;
+  margin-bottom: 1rem;
   padding: 0.6rem;
-  margin: 0.4rem 0 1rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
 }
 
 button {
-  background: var(--brand);
-  color: white;
-  border: none;
-  padding: 0.7rem 1.2rem;
+  padding: 0.7rem 1rem;
   border-radius: 999px;
+  border: none;
+  background: #0f4c81;
+  color: white;
   cursor: pointer;
-}
-
-.preview-surface {
-  background: #f8fafc;
-  padding: 1rem;
-  border-radius: 14px;
-}
-
-.certificate {
-  background: white;
-  border: 10px solid #c7a252;
-  aspect-ratio: 11 / 8.5;
-  padding: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.certificate-inner {
-  width: 100%;
-  text-align: center;
-  padding: 1rem;
-}
-
-.org {
-  font-size: 0.8rem;
-  letter-spacing: 2px;
-}
-
-.title {
-  font-family: Georgia, serif;
-  font-size: 1.8rem;
-  margin: 0.5rem 0;
-  color: #8b6a2b;
-  word-break: break-word;
-}
-
-.name {
-  font-size: 1.8rem;
-  border-bottom: 2px solid #0f4c81;
-  margin: 0.5rem auto;
-  width: 80%;
-}
-
-.rank {
-  font-weight: bold;
-  color: var(--brand);
-  margin-top: 0.5rem;
-}
-
-.signatures {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.line {
-  border-top: 1px solid black;
-  margin-bottom: 0.3rem;
-}
-
-.callout {
-  background: #fff7e6;
-  padding: 1rem;
-  border-radius: 10px;
-  margin-top: 1rem;
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .certificate, .certificate * {
-    visibility: visible;
-  }
-
-  .certificate {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 11in;
-    height: 8.5in;
-  }
 }
