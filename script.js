@@ -28,6 +28,17 @@ function formatDate(value) {
   return `${ordinal(day)} Day of ${month} ${year}`;
 }
 
+function syncAchievementTitle() {
+  const achievementSelect = document.getElementById("achievementNumber");
+  const titleInput = document.getElementById("achievementTitle");
+
+  const selectedOption = achievementSelect.options[achievementSelect.selectedIndex];
+  const title = selectedOption.dataset.title || "";
+
+  titleInput.value = title;
+  titleInput.disabled = !title;
+}
+
 /* ------------------ PREVIEW ------------------ */
 
 function updatePreview() {
@@ -69,7 +80,7 @@ async function generatePDF() {
   const rightSignerName = getValue("rightSignerName", "Joshua Bouldin");
   const rightSignerTitle = getValue("rightSignerTitle", "Deputy Commander for Cadets");
 
-  const pdfBytes = await fetch("template.pdf").then(res => res.arrayBuffer());
+  const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const page = pdfDoc.getPages()[0];
 
@@ -118,7 +129,6 @@ async function generatePDF() {
   drawCentered(cadetName, 0.447, 28, serif, black);
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
-  // PDF-only vertical positioning for these two lines
   const baseY = 0.66;
   const lineSpacing = 0.035;
 
@@ -166,9 +176,20 @@ async function generatePDF() {
 
 /* ------------------ EVENTS ------------------ */
 
-document.querySelectorAll("input").forEach(el => {
-  el.addEventListener("input", updatePreview);
-  el.addEventListener("change", updatePreview);
+document.querySelectorAll("input, select").forEach((el) => {
+  el.addEventListener("input", () => {
+    if (el.id === "achievementNumber") {
+      syncAchievementTitle();
+    }
+    updatePreview();
+  });
+
+  el.addEventListener("change", () => {
+    if (el.id === "achievementNumber") {
+      syncAchievementTitle();
+    }
+    updatePreview();
+  });
 });
 
 document.getElementById("downloadBtn").addEventListener("click", generatePDF);
@@ -178,4 +199,5 @@ if (!document.getElementById("promotionDate").value) {
     new Date().toISOString().slice(0, 10);
 }
 
+syncAchievementTitle();
 updatePreview();
