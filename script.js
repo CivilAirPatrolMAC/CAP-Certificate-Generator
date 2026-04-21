@@ -1,77 +1,111 @@
-const ranks = [
-  "Cadet Airman",
-  "Cadet Airman First Class",
-  "Cadet Senior Airman",
-  "Cadet Staff Sergeant",
-  "Cadet Technical Sergeant",
-  "Cadet Master Sergeant",
-  "Cadet Senior Master Sergeant",
-  "Cadet Chief Master Sergeant",
-  "Cadet Second Lieutenant",
-  "Cadet First Lieutenant",
-  "Cadet Captain",
-  "Cadet Major",
-  "Cadet Lieutenant Colonel"
-];
+const { PDFDocument, StandardFonts, rgb } = PDFLib;
 
-const cadetRank = document.getElementById("cadetRank");
-
-ranks.forEach(r => {
-  const option = document.createElement("option");
-  option.textContent = r;
-  cadetRank.appendChild(option);
-});
-
-const inputs = [
-  "cadetName",
-  "cadetRank",
-  "promotionDate",
-  "unitName",
-  "commanderName",
-  "commanderTitle"
-];
-
-function formatDate(val) {
-  if (!val) return "";
-  const d = new Date(val + "T00:00:00");
+function formatDate(value) {
+  if (!value) return "";
+  const d = new Date(value + "T00:00:00");
   return d.toLocaleDateString("en-US", {
-    year: "numeric",
+    day: "numeric",
     month: "long",
-    day: "numeric"
+    year: "numeric"
   });
 }
 
-function update() {
-  document.getElementById("previewName").textContent =
-    document.getElementById("cadetName").value || "Cadet Name";
+async function generatePDF() {
 
-  document.getElementById("previewRank").textContent =
-    cadetRank.value;
+  const achievementNumber = document.getElementById("achievementNumber").value;
+  const achievementTitle = document.getElementById("achievementTitle").value;
+  const cadetName = document.getElementById("cadetName").value;
+  const cadetRank = document.getElementById("cadetRank").value;
+  const date = formatDate(document.getElementById("promotionDate").value);
+  const unit = document.getElementById("unitLine").value;
 
-  document.getElementById("previewDate").textContent =
-    formatDate(document.getElementById("promotionDate").value);
+  const leftName = document.getElementById("leftSignerName").value;
+  const leftTitle = document.getElementById("leftSignerTitle").value;
 
-  document.getElementById("previewUnit").textContent =
-    document.getElementById("unitName").value || "";
+  const rightName = document.getElementById("rightSignerName").value;
+  const rightTitle = document.getElementById("rightSignerTitle").value;
 
-  document.getElementById("previewCommander").innerHTML =
-    (document.getElementById("commanderName").value || "") +
-    "<br>" +
-    (document.getElementById("commanderTitle").value || "");
+  const existingPdfBytes = await fetch("template.pdf").then(res => res.arrayBuffer());
+
+  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const page = pdfDoc.getPages()[0];
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  const { width, height } = page.getSize();
+
+  // === CENTER TEXT ===
+  const centerX = width / 2;
+
+  function drawCentered(text, y, size, fontUsed = font) {
+    const textWidth = fontUsed.widthOfTextAtSize(text, size);
+    page.drawText(text, {
+      x: centerX - textWidth / 2,
+      y,
+      size,
+      font: fontUsed,
+      color: rgb(0, 0, 0)
+    });
+  }
+
+  // === DRAW TEXT ===
+
+  drawCentered(achievementNumber, height - 200, 28, bold);
+  drawCentered(achievementTitle, height - 240, 20);
+  drawCentered(cadetName, height - 300, 24, bold);
+  drawCentered(cadetRank, height - 340, 16);
+
+  drawCentered(
+    `Proudly Presented on this ${date}`,
+    height - 380,
+    12
+  );
+
+  drawCentered(unit, height - 400, 12);
+
+  // LEFT SIGNATURE
+  page.drawText(leftName, {
+    x: 120,
+    y: 120,
+    size: 12,
+    font
+  });
+
+  page.drawText(leftTitle, {
+    x: 120,
+    y: 105,
+    size: 10,
+    font
+  });
+
+  // RIGHT SIGNATURE
+  page.drawText(rightName, {
+    x: width - 250,
+    y: 120,
+    size: 12,
+    font
+  });
+
+  page.drawText(rightTitle, {
+    x: width - 250,
+    y: 105,
+    size: 10,
+    font
+  });
+
+  // === SAVE ===
+  const pdfBytes = await pdfDoc.save();
+
+  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${cadetName}-certificate.pdf`;
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
 
-inputs.forEach(id => {
-  document.getElementById(id).addEventListener("input", update);
-});
-
-document.getElementById("printButton").onclick = () => window.print();
-
-// defaults
-document.getElementById("cadetName").value = "Cadet Jane Q. Sample";
-document.getElementById("unitName").value = "Example Composite Squadron";
-document.getElementById("commanderName").value = "Capt John Smith, CAP";
-document.getElementById("commanderTitle").value = "Squadron Commander";
-document.getElementById("promotionDate").value =
-  new Date().toISOString().slice(0, 10);
-
-update();
+document.getElementById("downloadBtn").addEventListener("click", generatePDF);
