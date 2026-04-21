@@ -1,48 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CAP Promotion Certificate Generator</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js"></script>
-</head>
-<body>
-
-<header>
-  <h1>Promotion Certificate Generator</h1>
-</header>
-
-<div class="container">
-
-  <!-- FORM -->
-  <div class="card">
-    <label>Cadet Name</label>
-    <input id="name" placeholder="Cadet Name">
-
-    <label>Rank</label>
-    <select id="rank"></select>
-
-    <label>Date</label>
-    <input type="date" id="date">
-
-    <button id="printBtn">Print / Save PDF</button>
-  </div>
-
-  <!-- PREVIEW -->
-  <div class="card">
-    <div class="certificate">
-      <h2>Certificate of Promotion</h2>
-      <p>This certifies that</p>
-      <h1 id="previewName">Name</h1>
-      <p>has been promoted to</p>
-      <h3 id="previewRank">Rank</h3>
-      <p id="previewDate">Date</p>
+<main class="app-shell">
+  <header class="page-header">
+    <div class="page-header__inner">
+      <div>
+        <p class="eyebrow">Civil Air Patrol Brand Tools</p>
+        <h1>Promotion Certificate Generator</h1>
+        <p class="lede">
+          Generate printable certificates for cadet promotions.
+        </p>
+      </div>
     </div>
-  </div>
+  </header>
 
-</div>
+  <section class="layout">
 
-<script src="script.js"></script>
-</body>
-</html>
+    <!-- LEFT: CONTROLS -->
+    <div class="controls-column">
+      <article class="card form-section">
+
+        <div class="section-heading">
+          <h2>Certificate details</h2>
+        </div>
+
+        <div class="form-grid">
+          <div class="field field--full">
+            <label>Cadet Name</label>
+            <input id="name">
+          </div>
+
+          <div class="field">
+            <label>Rank</label>
+            <select id="rank"></select>
+          </div>
+
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="date">
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="printBtn" class="button button--primary">
+            Print / Save PDF
+          </button>
+        </div>
+
+      </article>
+    </div>
+
+    <!-- RIGHT: PREVIEW -->
+    <div class="preview-column">
+      <div class="preview-sticky">
+        <article class="card preview-card">
+
+          <div class="preview-surface">
+            <section class="certificate">
+
+              <div class="certificate__inner">
+                <div class="certificate__org">
+                  Civil Air Patrol • United States Air Force Auxiliary
+                </div>
+
+                <h2 class="certificate__title">
+                  Certificate of Promotion
+                </h2>
+
+                <div>This certifies that</div>
+
+                <div id="previewName" class="certificate__name">
+                  Name
+                </div>
+
+                <div>has been promoted to</div>
+
+                <div id="previewRank" class="certificate__rank">
+                  Rank
+                </div>
+
+                <div id="previewDate"></div>
+              </div>
+
+            </section>
+          </div>
+
+        </article>
+      </div>
+    </div>
+
+  </section>
+</main>
