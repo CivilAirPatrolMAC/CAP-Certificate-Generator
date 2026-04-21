@@ -1,90 +1,163 @@
-<main class="app-shell">
-  <header class="page-header">
-    <div class="page-header__inner">
-      <div>
-        <p class="eyebrow">Civil Air Patrol Brand Tools</p>
-        <h1>Promotion Certificate Generator</h1>
-        <p class="lede">
-          Generate printable certificates for cadet promotions.
-        </p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAP Promotion Certificate Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="page-header">
+      <div class="page-header__inner">
+        <div class="page-header__content">
+          <p class="eyebrow">Civil Air Patrol Brand Tools</p>
+          <h1>Promotion Certificate Generator</h1>
+          <p class="lede">
+            Create printable cadet promotion certificates with a live preview before downloading or printing.
+          </p>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <section class="layout">
-
-    <!-- LEFT: CONTROLS -->
-    <div class="controls-column">
-      <article class="card form-section">
-
-        <div class="section-heading">
-          <h2>Certificate details</h2>
-        </div>
-
-        <div class="form-grid">
-          <div class="field field--full">
-            <label>Cadet Name</label>
-            <input id="name">
+    <section class="layout">
+      <div class="controls-column">
+        <article class="card guidance-card">
+          <div class="section-heading">
+            <h2>Certificate Guidance</h2>
+            <p>
+              Use the controls below to build a clean certificate that matches the look and feel of the CAP brand tools suite.
+            </p>
           </div>
 
-          <div class="field">
-            <label>Rank</label>
-            <select id="rank"></select>
+          <div class="callout callout--warning">
+            <h3>Before you generate</h3>
+            <ul>
+              <li>Verify the cadet’s full name, grade, and effective promotion date.</li>
+              <li>Confirm the wording and signature block match your local approval process.</li>
+              <li>Review spacing, readability, and print layout before saving a PDF.</li>
+            </ul>
           </div>
+        </article>
 
-          <div class="field">
-            <label>Date</label>
-            <input type="date" id="date">
-          </div>
-        </div>
+        <article class="card form-card">
+          <section class="form-section">
+            <div class="section-heading">
+              <h2>Details</h2>
+              <p>Enter the promotion information exactly as it should appear on the certificate.</p>
+            </div>
 
-        <div class="button-row">
-          <button id="printBtn" class="button button--primary">
-            Print / Save PDF
-          </button>
-        </div>
-
-      </article>
-    </div>
-
-    <!-- RIGHT: PREVIEW -->
-    <div class="preview-column">
-      <div class="preview-sticky">
-        <article class="card preview-card">
-
-          <div class="preview-surface">
-            <section class="certificate">
-
-              <div class="certificate__inner">
-                <div class="certificate__org">
-                  Civil Air Patrol • United States Air Force Auxiliary
-                </div>
-
-                <h2 class="certificate__title">
-                  Certificate of Promotion
-                </h2>
-
-                <div>This certifies that</div>
-
-                <div id="previewName" class="certificate__name">
-                  Name
-                </div>
-
-                <div>has been promoted to</div>
-
-                <div id="previewRank" class="certificate__rank">
-                  Rank
-                </div>
-
-                <div id="previewDate"></div>
+            <div class="form-grid">
+              <div class="field field--full">
+                <label for="cadetName">Cadet name</label>
+                <input id="cadetName" type="text" placeholder="Cadet Jane Q. Sample" />
               </div>
 
-            </section>
-          </div>
+              <div class="field">
+                <label for="cadetRank">Promoted to rank</label>
+                <select id="cadetRank"></select>
+              </div>
 
+              <div class="field">
+                <label for="promotionDate">Promotion date</label>
+                <input id="promotionDate" type="date" />
+              </div>
+
+              <div class="field field--full">
+                <label for="unitName">Unit name</label>
+                <input id="unitName" type="text" placeholder="Example Composite Squadron" />
+              </div>
+
+              <div class="field">
+                <label for="commanderName">Commander name</label>
+                <input id="commanderName" type="text" placeholder="Capt John Smith, CAP" />
+              </div>
+
+              <div class="field">
+                <label for="commanderTitle">Commander title</label>
+                <input id="commanderTitle" type="text" placeholder="Squadron Commander" />
+              </div>
+            </div>
+          </section>
         </article>
       </div>
-    </div>
 
-  </section>
-</main>
+      <div class="preview-column">
+        <div class="preview-sticky">
+          <article class="card preview-card">
+            <div class="preview-card__header">
+              <div class="preview-card__title">
+                <h2>Live Preview</h2>
+                <p>Review the certificate before printing or saving as PDF.</p>
+              </div>
+            </div>
+
+            <div class="preview-surface">
+              <div class="certificate-frame">
+                <section class="certificate" id="certificatePreview">
+                  <div class="certificate__inner">
+                    <div class="certificate__org">
+                      Civil Air Patrol • United States Air Force Auxiliary
+                    </div>
+
+                    <h2 class="certificate__title">Certificate of Promotion</h2>
+
+                    <p class="certificate__text">This certifies that</p>
+
+                    <div class="certificate__name" id="previewName">
+                      Cadet Jane Q. Sample
+                    </div>
+
+                    <p class="certificate__text">
+                      has successfully completed all requirements and is hereby promoted to the grade of
+                    </p>
+
+                    <div class="certificate__rank" id="previewRank">
+                      Cadet Airman
+                    </div>
+
+                    <p class="certificate__meta">
+                      Effective <span id="previewDate">April 21, 2026</span>
+                    </p>
+
+                    <p class="certificate__meta" id="previewUnit">
+                      Example Composite Squadron
+                    </p>
+
+                    <div class="signature-row">
+                      <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div class="signature-caption" id="previewCommander">
+                          Capt John Smith, CAP<br />
+                          Squadron Commander
+                        </div>
+                      </div>
+
+                      <div class="signature-block">
+                        <div class="signature-line"></div>
+                        <div class="signature-caption">Date of Presentation</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <div class="button-row preview-actions">
+                <button id="printButton" class="button button--primary" type="button">
+                  Print / Save PDF
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <p class="page-footer">
+      Promotion certificate generator styled to align with the CAP logo generator interface.
+    </p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
