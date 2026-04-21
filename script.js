@@ -159,20 +159,25 @@ async function generatePDF() {
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
   const rankImagePath = getRankImage(achievementNumber);
-  if (rankImagePath) {
-    const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
-    const img = await pdfDoc.embedJpg(imgBytes);
+if (rankImagePath) {
+  const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
+  const img = await pdfDoc.embedJpg(imgBytes);
 
-    const imgWidth = 140;  // bigger
-const imgHeight = (img.height / img.width) * imgWidth;
+  // Smaller size to better match the preview
+  const imgWidth = 70;
+  const imgHeight = (img.height / img.width) * imgWidth;
 
-page.drawImage(img, {
-  x: width * 0.18,     // moved left
-  y: height * 0.47,    // vertically aligned
-  width: imgWidth,
-  height: imgHeight
-});
-  }
+  // Position by center point so it behaves more like the preview
+  const centerX = width * 0.22;
+  const centerY = height * 0.49;
+
+  page.drawImage(img, {
+    x: centerX - (imgWidth / 2),
+    y: centerY - (imgHeight / 2),
+    width: imgWidth,
+    height: imgHeight
+  });
+}
 
   const baseY = 0.66;
   const lineSpacing = 0.035;
