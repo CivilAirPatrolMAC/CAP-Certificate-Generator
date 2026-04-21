@@ -163,15 +163,15 @@ async function generatePDF() {
     const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
     const img = await pdfDoc.embedJpg(imgBytes);
 
-    const imgWidth = 72;
-    const imgHeight = (img.height / img.width) * imgWidth;
+    const imgWidth = 140;  // bigger
+const imgHeight = (img.height / img.width) * imgWidth;
 
-    page.drawImage(img, {
-      x: width * 0.72,
-      y: height * 0.505,
-      width: imgWidth,
-      height: imgHeight
-    });
+page.drawImage(img, {
+  x: width * 0.18,     // moved left
+  y: height * 0.47,    // vertically aligned
+  width: imgWidth,
+  height: imgHeight
+});
   }
 
   const baseY = 0.66;
