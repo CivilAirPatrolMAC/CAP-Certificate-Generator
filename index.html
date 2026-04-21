@@ -4,95 +4,147 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CAP Certificate Generator</title>
+
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
+
 <body>
   <main class="app-shell">
+
+    <!-- HEADER -->
     <header class="page-header">
       <div class="page-header__inner">
-        <p class="eyebrow">Civil Air Patrol Brand Tools</p>
-        <h1>Achievement Certificate Generator</h1>
-        <p class="lede">
+        <div class="page-header__content">
+          <p class="eyebrow">Civil Air Patrol Brand Tools</p>
+          <h1>Achievement Certificate Generator</h1>
+          <p class="lede">
             Build and export Civil Air Patrol cadet achievement certificates.
-            Select an achievement, verify the auto-filled rank and title, enter the cadet’s details,
+            Select an achievement, verify the auto-filled rank and title, enter cadet details,
             preview the layout, and download a finalized PDF for presentation.
-        </p>
+          </p>
+        </div>
 
-        <button type="button"
-          onclick="window.location.href='https://cap-brand-tools.netlify.app/'"
-          >
+        <nav class="tool-nav" aria-label="Tool navigation">
+          <a class="tool-nav__link" href="https://cap-brand-tools.netlify.app/">
             Brand Tools Home
-          </button>
+          </a>
 
-          <button
-            type="button"
-            onclick="window.location.href='https://cap-logo-generator.netlify.app/'"
-          >
+          <a class="tool-nav__link" href="https://cap-logo-generator.netlify.app/">
             Subordinate Entity Graphic Generator
-          </button>
+          </a>
 
-          <button
-            type="button"
-            onclick="window.location.href='https://cap-signature-generator.netlify.app/'"
-          >
+          <a class="tool-nav__link" href="https://cap-signature-generator.netlify.app/">
             Email Signature Block Generator
-          </button>
+          </a>
 
-           <button
-            type="button"
-            onclick="window.location.href='https://cap-business-card-generator.netlify.app'"
-          >
+          <a class="tool-nav__link" href="https://cap-business-card-generator.netlify.app">
             Business Card Generator
-          </button>
-        
-      </div>
-       
+          </a>
 
-      
+          <a class="tool-nav__link tool-nav__link--active" href="#">
+            Achievement Certificate Generator
+          </a>
+        </nav>
+      </div>
     </header>
 
+    <!-- MAIN LAYOUT -->
     <section class="layout">
+
+      <!-- LEFT COLUMN -->
       <div class="controls-column">
-        <article class="card">
+
+        <!-- GUIDANCE CARD -->
+        <section class="card guidance-card">
+          <div class="section-heading">
+            <h2>Certificate Guidance</h2>
+            <p>
+              Use the controls below to generate consistent, professional cadet achievement certificates
+              using the approved template, achievement structure, and rank associations.
+            </p>
+          </div>
+
+          <div class="callout callout--warning">
+            <h3>Before you generate</h3>
+            <ul>
+              <li>Verify the cadet’s full name, achievement, and promotion date.</li>
+              <li>Confirm the unit line appears exactly as it should on the certificate.</li>
+              <li>Review rank insignia, signature blocks, and spacing before downloading.</li>
+              <li>Use the live preview to confirm the final certificate layout.</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- DETAILS FORM -->
+        <section class="card">
           <h2>Details</h2>
 
-         <label for="achievementNumber">Achievement</label>
-<select id="achievementNumber">
-  <option value='ACHIEVEMENT 2' data-title='General "Hap" Arnold' data-rank="Cadet Airman First Class">Achievement 2 - General "Hap" Arnold</option>
-  <option value="ACHIEVEMENT 3" data-title="Mary Feik" data-rank="Cadet Senior Airman">Achievement 3 - Mary Feik</option>
-  <option value="ACHIEVEMENT 4" data-title="Capt. Eddie Rickenbacker" data-rank="Cadet Technical Sergeant">Achievement 4 - Capt. Eddie Rickenbacker</option>
-  <option value="ACHIEVEMENT 5" data-title="" data-rank="Cadet Master Sergeant">Achievement 5</option>
-  <option value="ACHIEVEMENT 6" data-title="Gen. Jimmy Doolittle" data-rank="Cadet Senior Master Sergeant">Achievement 6 - Gen. Jimmy Doolittle</option>
-  <option value="ACHIEVEMENT 7" data-title="Dr. Robert Goddard" data-rank="Cadet Senior Master Sergeant" selected>Achievement 7 - Dr. Robert Goddard</option>
-  <option value="ACHIEVEMENT 8" data-title="Neil Armstrong" data-rank="Cadet Chief Master Sergeant">Achievement 8 - Neil Armstrong</option>
-  <option value="ACHIEVEMENT 9" data-title="" data-rank="Cadet Second Lieutenant">Achievement 9</option>
-  <option value="ACHIEVEMENT 10" data-title="Willa Brown" data-rank="Cadet First Lieutenant">Achievement 10 - Willa Brown</option>
-  <option value="ACHIEVEMENT 11" data-title="" data-rank="Cadet First Lieutenant">Achievement 11</option>
-  <option value="ACHIEVEMENT 12" data-title="" data-rank="Cadet Captain">Achievement 12</option>
-  <option value="ACHIEVEMENT 13" data-title="" data-rank="Cadet Captain">Achievement 13</option>
-  <option value="ACHIEVEMENT 14" data-title="George Boyd" data-rank="Cadet Major">Achievement 14 - George Boyd</option>
-  <option value="ACHIEVEMENT 15" data-title="Sally Ride" data-rank="Cadet Major">Achievement 15 - Sally Ride</option>
-  <option value="ACHIEVEMENT 16" data-title="" data-rank="Cadet Major">Achievement 16</option>
-</select>
+          <label for="achievementNumber">Achievement</label>
+          <select id="achievementNumber">
+            <option value='ACHIEVEMENT 2' data-title='General "Hap" Arnold' data-rank="Cadet Airman First Class">
+              Achievement 2 - General "Hap" Arnold
+            </option>
+            <option value="ACHIEVEMENT 3" data-title="Mary Feik" data-rank="Cadet Senior Airman">
+              Achievement 3 - Mary Feik
+            </option>
+            <option value="ACHIEVEMENT 4" data-title="Capt. Eddie Rickenbacker" data-rank="Cadet Technical Sergeant">
+              Achievement 4 - Capt. Eddie Rickenbacker
+            </option>
+            <option value="ACHIEVEMENT 5" data-title="" data-rank="Cadet Master Sergeant">
+              Achievement 5
+            </option>
+            <option value="ACHIEVEMENT 6" data-title="Gen. Jimmy Doolittle" data-rank="Cadet Senior Master Sergeant">
+              Achievement 6 - Gen. Jimmy Doolittle
+            </option>
+            <option value="ACHIEVEMENT 7" data-title="Dr. Robert Goddard" data-rank="Cadet Senior Master Sergeant" selected>
+              Achievement 7 - Dr. Robert Goddard
+            </option>
+            <option value="ACHIEVEMENT 8" data-title="Neil Armstrong" data-rank="Cadet Chief Master Sergeant">
+              Achievement 8 - Neil Armstrong
+            </option>
+            <option value="ACHIEVEMENT 9" data-title="" data-rank="Cadet Second Lieutenant">
+              Achievement 9
+            </option>
+            <option value="ACHIEVEMENT 10" data-title="Willa Brown" data-rank="Cadet First Lieutenant">
+              Achievement 10 - Willa Brown
+            </option>
+            <option value="ACHIEVEMENT 11" data-title="" data-rank="Cadet First Lieutenant">
+              Achievement 11
+            </option>
+            <option value="ACHIEVEMENT 12" data-title="" data-rank="Cadet Captain">
+              Achievement 12
+            </option>
+            <option value="ACHIEVEMENT 13" data-title="" data-rank="Cadet Captain">
+              Achievement 13
+            </option>
+            <option value="ACHIEVEMENT 14" data-title="George Boyd" data-rank="Cadet Major">
+              Achievement 14 - George Boyd
+            </option>
+            <option value="ACHIEVEMENT 15" data-title="Sally Ride" data-rank="Cadet Major">
+              Achievement 15 - Sally Ride
+            </option>
+            <option value="ACHIEVEMENT 16" data-title="" data-rank="Cadet Major">
+              Achievement 16
+            </option>
+          </select>
 
-<label for="achievementTitle">Achievement Title</label>
-<input id="achievementTitle" value="Dr. Robert Goddard" disabled>
-
+          <label for="achievementTitle">Achievement Title</label>
+          <input id="achievementTitle" value="Dr. Robert Goddard" disabled />
 
           <label for="cadetName">Cadet Name</label>
           <input id="cadetName" value="Hanniah Beacham" />
 
           <label for="cadetRank">Cadet Rank</label>
-         <input id="cadetRank" disabled>
+          <input id="cadetRank" disabled />
 
           <label for="promotionDate">Date earned in eServices</label>
           <input id="promotionDate" type="date" />
 
           <label for="unitLine">Unit Line</label>
           <p class="field-help">
-              Enter the full unit name and location as it should appear on the certificate (e.g., Squadron, City, State).
+            Enter the full unit name and location as it should appear on the certificate
+            (e.g., Squadron, City, State).
           </p>
           <input id="unitLine" value="Fort Worth Phoenix Composite Squadron, Fort Worth, Texas" />
 
@@ -111,13 +163,20 @@
           <div class="button-row">
             <button id="downloadBtn" type="button">Download PDF</button>
           </div>
-          <footer class="page-footer">
-          Beta Version 1. Last modified on April 21th, 2026. Managed by
-          <a href="mailto:brand@capnhq.gov">Maj. Roman Vitanza</a>.
+        </section>
+
+        <!-- FOOTER (correct location) -->
+        <footer class="page-footer">
+          <p>Beta Version 1. Last modified on April 21st, 2026.</p>
+          <p>
+            Managed by
+            <a href="mailto:brand@capnhq.gov">Maj. Roman Vitanza</a>.
+          </p>
         </footer>
-        </article>
+
       </div>
 
+      <!-- RIGHT COLUMN -->
       <div class="preview-column">
         <article class="card">
           <h2>Live Preview</h2>
@@ -125,8 +184,9 @@
 
           <div class="preview-frame">
             <div class="certificate-preview">
+
               <img id="previewRankImage" class="preview-rank-image" src="" alt="Cadet rank insignia" />
-              <img src="template-preview.png" alt="Certificate template preview" class="certificate-bg" />
+              <img src="template-preview.png" class="certificate-bg" alt="Certificate template" />
 
               <div id="previewAchievementNumber" class="preview-text achievement-number">ACHIEVEMENT 7</div>
               <div id="previewAchievementTitle" class="preview-text achievement-title">Dr. Robert Goddard</div>
@@ -140,13 +200,15 @@
 
               <div id="previewRightSignerName" class="preview-text right-signer-name">Joshua Bouldin</div>
               <div id="previewRightSignerTitle" class="preview-text right-signer-title">Deputy Commander for Cadets</div>
+
             </div>
           </div>
         </article>
       </div>
+
     </section>
   </main>
-      
+
   <script src="script.js"></script>
 </body>
 </html>
