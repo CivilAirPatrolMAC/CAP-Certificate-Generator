@@ -1,43 +1,230 @@
+:root {
+  --brand: #0f4c81;
+  --brand-dark: #0b3559;
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --text: #12263a;
+  --text-soft: #526377;
+  --border: #d9e2ec;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: Inter, system-ui, sans-serif;
-  background: #f4f7fb;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .app-shell {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 1.5rem;
 }
 
 .page-header__inner {
-  background: linear-gradient(135deg, #0f4c81, #0b3559);
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
   color: white;
   padding: 1.5rem;
-  border-radius: 16px;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-header__inner h1 {
+  margin: 0 0 0.5rem;
+}
+
+.lede {
+  margin: 0;
+  opacity: 0.95;
 }
 
 .layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 1.5rem;
   margin-top: 1.5rem;
+  align-items: start;
 }
 
 .card {
-  background: white;
+  background: var(--surface);
   padding: 1.5rem;
-  border-radius: 16px;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.preview-subtitle {
+  margin-top: 0;
+  color: var(--text-soft);
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-top: 0.9rem;
+  margin-bottom: 0.4rem;
 }
 
 input {
   width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.6rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #b8c7d9;
+  border-radius: 12px;
+  font: inherit;
+}
+
+.button-row {
+  margin-top: 1.25rem;
 }
 
 button {
-  padding: 0.7rem 1rem;
+  padding: 0.8rem 1.2rem;
   border-radius: 999px;
   border: none;
-  background: #0f4c81;
+  background: var(--brand);
   color: white;
+  font: inherit;
+  font-weight: 700;
   cursor: pointer;
+}
+
+button:hover {
+  background: var(--brand-dark);
+}
+
+.preview-frame {
+  margin-top: 1rem;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 1rem;
+}
+
+.certificate-preview {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  aspect-ratio: 11 / 8.5;
+  margin: 0 auto;
+  background: white;
+}
+
+.certificate-bg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.preview-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #111;
+  white-space: nowrap;
+}
+
+.achievement-number {
+  top: 24.5%;
+  font-size: clamp(18px, 3vw, 32px);
+  font-weight: 800;
+  color: #0a2c85;
+  letter-spacing: 0.03em;
+}
+
+.achievement-title {
+  top: 34.2%;
+  font-size: clamp(16px, 2.2vw, 24px);
+  font-weight: 700;
+  color: #17307a;
+}
+
+.cadet-name {
+  top: 44.7%;
+  font-size: clamp(20px, 3vw, 34px);
+  font-family: Georgia, "Times New Roman", serif;
+  color: #111;
+}
+
+.cadet-rank {
+  top: 53.3%;
+  font-size: clamp(14px, 1.9vw, 22px);
+  font-weight: 800;
+  color: #163b8f;
+  letter-spacing: 0.02em;
+}
+
+.presented-line {
+  top: 64.4%;
+  font-size: clamp(10px, 1.45vw, 18px);
+  font-weight: 700;
+  color: #222;
+}
+
+.unit-line {
+  top: 68.4%;
+  font-size: clamp(10px, 1.35vw, 17px);
+  font-style: italic;
+  font-weight: 700;
+  color: #222;
+}
+
+.left-signer-name {
+  left: 28.5%;
+  top: 87.8%;
+  transform: translateX(-50%);
+  font-size: clamp(11px, 1.5vw, 18px);
+  color: #111;
+}
+
+.left-signer-title {
+  left: 28.5%;
+  top: 91.0%;
+  transform: translateX(-50%);
+  font-size: clamp(10px, 1.2vw, 15px);
+  color: #222;
+}
+
+.right-signer-name {
+  left: 73.2%;
+  top: 87.8%;
+  transform: translateX(-50%);
+  font-size: clamp(11px, 1.5vw, 18px);
+  color: #111;
+}
+
+.right-signer-title {
+  left: 73.2%;
+  top: 91.0%;
+  transform: translateX(-50%);
+  font-size: clamp(10px, 1.2vw, 15px);
+  color: #222;
+}
+
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
 }
