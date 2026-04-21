@@ -106,7 +106,6 @@ async function generatePDF() {
     });
   }
 
-  // NEW: center text under signature lines
   function drawCenteredAt(text, centerPercentX, percentY, size, fontUsed, color = black) {
     const textWidth = fontUsed.widthOfTextAtSize(text, size);
     page.drawText(text, {
@@ -125,25 +124,20 @@ async function generatePDF() {
   drawCentered(cadetName, 0.447, 28, serif, black);
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
-  drawCentered(
-    `Proudly Presented on this ${formatDate(promotionDate)}`,
-    0.644,
-    12,
-    bold,
-    black
-  );
+  // Only draw DATE (template already has "Proudly Presented on this")
+  drawCentered(formatDate(promotionDate), 0.683, 12, bold, black);
 
-  drawCentered(unitLine, 0.684, 12, bold, black);
+  drawCentered(unitLine, 0.722, 12, bold, black);
 
-  /* ---------- SIGNATURES (CENTERED FIX) ---------- */
+  /* ---------- SIGNATURES ---------- */
 
-  // LEFT SIGNATURE
+  // LEFT
   drawCenteredAt(leftSignerName, 0.285, 0.878, 12, font);
   drawCenteredAt(leftSignerTitle, 0.285, 0.91, 10, font);
 
-  // RIGHT SIGNATURE
-  drawCenteredAt(rightSignerName, 0.732, 0.878, 12, font);
-  drawCenteredAt(rightSignerTitle, 0.732, 0.91, 10, font);
+  // RIGHT (adjusted alignment)
+  drawCenteredAt(rightSignerName, 0.705, 0.878, 12, font);
+  drawCenteredAt(rightSignerTitle, 0.705, 0.91, 10, font);
 
   /* ---------- SAVE ---------- */
 
