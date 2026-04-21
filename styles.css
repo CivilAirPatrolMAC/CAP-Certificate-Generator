@@ -187,6 +187,17 @@ button:hover {
   letter-spacing: 0.02em;
 }
 
+.preview-rank-image {
+  position: absolute;
+  top: 45.8%;
+  left: 74.5%;
+  transform: translate(-50%, -50%);
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  display: none;
+}
+
 .presented-line {
   top: 64.4%;
   font-size: clamp(10px, 1.45vw, 18px);
