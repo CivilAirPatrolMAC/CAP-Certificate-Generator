@@ -471,3 +471,48 @@ button:hover {
 .page-footer a:hover {
   text-decoration: underline;
 }
+
+.guidance-card {
+  margin-bottom: 1.5rem;
+}
+
+.section-heading {
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0 0 0.4rem;
+}
+
+.section-heading p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.callout {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px solid #e7c27d;
+  background: #fff7e6;
+}
+
+.callout h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.callout ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.callout li + li {
+  margin-top: 0.45rem;
+}
+
+.callout--warning {
+  background: #fff7e6;
+  border-color: #e7c27d;
+}
