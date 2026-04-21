@@ -41,6 +41,7 @@ function syncAchievementFields() {
   titleInput.disabled = !title;
 
   rankInput.value = rank;
+  rankInput.disabled = true;
 }
 
 /* ------------------ PREVIEW ------------------ */
