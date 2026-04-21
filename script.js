@@ -46,15 +46,11 @@ function updatePreview() {
   document.getElementById("previewAchievementTitle").textContent = achievementTitle;
   document.getElementById("previewCadetName").textContent = cadetName;
   document.getElementById("previewCadetRank").textContent = cadetRank;
-
   document.getElementById("previewPresentedLine").textContent =
     `Proudly Presented on this ${formatDate(promotionDate)}`;
-
   document.getElementById("previewUnitLine").textContent = unitLine;
-
   document.getElementById("previewLeftSignerName").textContent = leftSignerName;
   document.getElementById("previewLeftSignerTitle").textContent = leftSignerTitle;
-
   document.getElementById("previewRightSignerName").textContent = rightSignerName;
   document.getElementById("previewRightSignerTitle").textContent = rightSignerTitle;
 }
@@ -86,8 +82,6 @@ async function generatePDF() {
   const blue = rgb(0.05, 0.18, 0.52);
   const black = rgb(0.1, 0.1, 0.1);
 
-  /* ---------- POSITION SYSTEM ---------- */
-
   function yPercent(percent) {
     return height * (1 - percent);
   }
@@ -117,29 +111,25 @@ async function generatePDF() {
     });
   }
 
-  /* ---------- MAIN TEXT ---------- */
-
   drawCentered(achievementNumber, 0.245, 26, bold, blue);
   drawCentered(achievementTitle, 0.342, 20, bold, blue);
   drawCentered(cadetName, 0.447, 28, serif, black);
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
-  // Only draw DATE (template already has "Proudly Presented on this")
   drawCentered(formatDate(promotionDate), 0.683, 12, bold, black);
-
   drawCentered(unitLine, 0.722, 12, bold, black);
 
-  /* ---------- SIGNATURES ---------- */
+  // Signature line centers tuned to the actual template
+  const leftSignatureCenter = 0.285;
+  const rightSignatureCenter = 0.695;
 
   // LEFT
-  drawCenteredAt(leftSignerName, 0.285, 0.878, 12, font);
-  drawCenteredAt(leftSignerTitle, 0.285, 0.91, 10, font);
+  drawCenteredAt(leftSignerName, leftSignatureCenter, 0.878, 12, font);
+  drawCenteredAt(leftSignerTitle, leftSignatureCenter, 0.91, 10, font);
 
-  // RIGHT (adjusted alignment)
-  drawCenteredAt(rightSignerName, 0.705, 0.878, 12, font);
-  drawCenteredAt(rightSignerTitle, 0.705, 0.91, 10, font);
-
-  /* ---------- SAVE ---------- */
+  // RIGHT
+  drawCenteredAt(rightSignerName, rightSignatureCenter, 0.878, 12, font);
+  drawCenteredAt(rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
 
   const finalBytes = await pdfDoc.save();
 
@@ -163,7 +153,6 @@ document.querySelectorAll("input").forEach(el => {
 
 document.getElementById("downloadBtn").addEventListener("click", generatePDF);
 
-/* DEFAULT DATE */
 if (!document.getElementById("promotionDate").value) {
   document.getElementById("promotionDate").value =
     new Date().toISOString().slice(0, 10);
