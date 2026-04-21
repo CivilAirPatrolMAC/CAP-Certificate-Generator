@@ -121,7 +121,7 @@ async function generatePDF() {
 
   // Signature line centers tuned to the actual template
   const leftSignatureCenter = 0.285;
-  const rightSignatureCenter = 0.730;
+  const rightSignatureCenter = 0.720;
 
   // LEFT
   drawCenteredAt(leftSignerName, leftSignatureCenter, 0.878, 12, font);
