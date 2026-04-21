@@ -444,3 +444,30 @@ button:hover {
     height: 60px;
   }
 }
+
+.controls-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-footer {
+  margin-top: auto; /* pushes it to the bottom */
+  padding-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.page-footer p {
+  margin: 0.25rem 0;
+}
+
+.page-footer a {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.page-footer a:hover {
+  text-decoration: underline;
+}
