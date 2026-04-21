@@ -1,30 +1,10 @@
 const { PDFDocument, StandardFonts, rgb } = PDFLib;
 
+/* ------------------ HELPERS ------------------ */
+
 function getValue(id, fallback = "") {
   const el = document.getElementById(id);
   return el ? el.value.trim() : fallback;
-}
-
-function formatPreviewDate(value) {
-  if (!value) return "10th Day of January 2026";
-
-  const d = new Date(`${value}T00:00:00`);
-  const day = d.getDate();
-  const month = d.toLocaleDateString("en-US", { month: "long" });
-  const year = d.getFullYear();
-
-  return `${ordinal(day)} Day of ${month} ${year}`;
-}
-
-function formatPdfDate(value) {
-  if (!value) return "10th Day of January 2026";
-
-  const d = new Date(`${value}T00:00:00`);
-  const day = d.getDate();
-  const month = d.toLocaleDateString("en-US", { month: "long" });
-  const year = d.getFullYear();
-
-  return `${ordinal(day)} Day of ${month} ${year}`;
 }
 
 function ordinal(n) {
@@ -36,6 +16,19 @@ function ordinal(n) {
     default: return `${n}th`;
   }
 }
+
+function formatDate(value) {
+  if (!value) return "10th Day of January 2026";
+
+  const d = new Date(`${value}T00:00:00`);
+  const day = d.getDate();
+  const month = d.toLocaleDateString("en-US", { month: "long" });
+  const year = d.getFullYear();
+
+  return `${ordinal(day)} Day of ${month} ${year}`;
+}
+
+/* ------------------ PREVIEW ------------------ */
 
 function updatePreview() {
   const achievementNumber = getValue("achievementNumber", "ACHIEVEMENT 7");
@@ -54,25 +47,17 @@ function updatePreview() {
   document.getElementById("previewCadetName").textContent = cadetName;
   document.getElementById("previewCadetRank").textContent = cadetRank;
   document.getElementById("previewPresentedLine").textContent =
-    `Proudly Presented on this ${formatPreviewDate(promotionDate)}`;
+    `Proudly Presented on this ${formatDate(promotionDate)}`;
   document.getElementById("previewUnitLine").textContent = unitLine;
+
   document.getElementById("previewLeftSignerName").textContent = leftSignerName;
   document.getElementById("previewLeftSignerTitle").textContent = leftSignerTitle;
+
   document.getElementById("previewRightSignerName").textContent = rightSignerName;
   document.getElementById("previewRightSignerTitle").textContent = rightSignerTitle;
 }
 
-function drawCentered(page, text, y, size, font, color) {
-  const { width } = page.getSize();
-  const textWidth = font.widthOfTextAtSize(text, size);
-  page.drawText(text, {
-    x: (width - textWidth) / 2,
-    y,
-    size,
-    font,
-    color
-  });
-}
+/* ------------------ PDF ------------------ */
 
 async function generatePDF() {
   const achievementNumber = getValue("achievementNumber", "ACHIEVEMENT 7");
@@ -86,59 +71,79 @@ async function generatePDF() {
   const rightSignerName = getValue("rightSignerName", "Joshua Bouldin");
   const rightSignerTitle = getValue("rightSignerTitle", "Deputy Commander for Cadets");
 
-  const existingPdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
-  const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  const pdfBytes = await fetch("template.pdf").then(res => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(pdfBytes);
   const page = pdfDoc.getPages()[0];
 
-  const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const serifFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+  const { width, height } = page.getSize();
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const serif = await pdfDoc.embedFont(StandardFonts.TimesRoman);
 
   const blue = rgb(0.05, 0.18, 0.52);
-  const black = rgb(0.08, 0.08, 0.08);
+  const black = rgb(0.1, 0.1, 0.1);
 
-  // These positions are tuned for your uploaded template and will likely need small nudges.
-  drawCentered(page, achievementNumber, 600, 26, boldFont, blue);
-  drawCentered(page, achievementTitle, 548, 21, boldFont, blue);
-  drawCentered(page, cadetName, 474, 28, serifFont, black);
-  drawCentered(page, cadetRank, 410, 18, boldFont, blue);
-  drawCentered(page, `Proudly Presented on this ${formatPdfDate(promotionDate)}`, 348, 12, boldFont, black);
-  drawCentered(page, unitLine, 324, 12, boldFont, black);
+  /* ---------- POSITION SYSTEM (MATCHES CSS %) ---------- */
 
-  page.drawText(leftSignerName, {
-    x: 160,
-    y: 120,
-    size: 13,
-    font: regularFont,
-    color: black
-  });
+  function yPercent(percent) {
+    return height * (1 - percent);
+  }
 
-  page.drawText(leftSignerTitle, {
-    x: 145,
-    y: 101,
-    size: 11,
-    font: regularFont,
-    color: black
-  });
+  function centerX(text, size, fontUsed) {
+    return (width - fontUsed.widthOfTextAtSize(text, size)) / 2;
+  }
 
-  page.drawText(rightSignerName, {
-    x: 535,
-    y: 120,
-    size: 13,
-    font: regularFont,
-    color: black
-  });
+  function drawCentered(text, percentY, size, fontUsed, color) {
+    page.drawText(text, {
+      x: centerX(text, size, fontUsed),
+      y: yPercent(percentY),
+      size,
+      font: fontUsed,
+      color
+    });
+  }
 
-  page.drawText(rightSignerTitle, {
-    x: 495,
-    y: 101,
-    size: 11,
-    font: regularFont,
-    color: black
-  });
+  function drawLeft(text, percentX, percentY, size, fontUsed) {
+    page.drawText(text, {
+      x: width * percentX,
+      y: yPercent(percentY),
+      size,
+      font: fontUsed,
+      color: black
+    });
+  }
 
-  const pdfBytes = await pdfDoc.save();
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  /* ---------- DRAW TEXT (MATCHES PREVIEW CSS) ---------- */
+
+  drawCentered(achievementNumber, 0.245, 26, bold, blue);
+  drawCentered(achievementTitle, 0.342, 20, bold, blue);
+  drawCentered(cadetName, 0.447, 28, serif, black);
+  drawCentered(cadetRank, 0.533, 16, bold, blue);
+
+  drawCentered(
+    `Proudly Presented on this ${formatDate(promotionDate)}`,
+    0.644,
+    12,
+    bold,
+    black
+  );
+
+  drawCentered(unitLine, 0.684, 12, bold, black);
+
+  /* SIGNATURES */
+
+  drawLeft(leftSignerName, 0.18, 0.878, 12, font);
+  drawLeft(leftSignerTitle, 0.16, 0.91, 10, font);
+
+  drawLeft(rightSignerName, 0.68, 0.878, 12, font);
+  drawLeft(rightSignerTitle, 0.64, 0.91, 10, font);
+
+  /* ---------- SAVE ---------- */
+
+  const finalBytes = await pdfDoc.save();
+
+  const blob = new Blob([finalBytes], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
@@ -149,15 +154,19 @@ async function generatePDF() {
   URL.revokeObjectURL(url);
 }
 
-document.querySelectorAll("input").forEach((input) => {
-  input.addEventListener("input", updatePreview);
-  input.addEventListener("change", updatePreview);
+/* ------------------ EVENTS ------------------ */
+
+document.querySelectorAll("input").forEach(el => {
+  el.addEventListener("input", updatePreview);
+  el.addEventListener("change", updatePreview);
 });
 
 document.getElementById("downloadBtn").addEventListener("click", generatePDF);
 
+/* DEFAULT DATE */
 if (!document.getElementById("promotionDate").value) {
-  document.getElementById("promotionDate").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("promotionDate").value =
+    new Date().toISOString().slice(0, 10);
 }
 
 updatePreview();
