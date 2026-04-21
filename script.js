@@ -28,6 +28,20 @@ function formatDate(value) {
   return `${ordinal(day)} Day of ${month} ${year}`;
 }
 
+function getRankImage(achievementNumber) {
+  const map = {
+    "ACHIEVEMENT 2": "ranks/A2.jpg",
+    "ACHIEVEMENT 3": "ranks/A3.jpg",
+    "ACHIEVEMENT 4": "ranks/A4.jpg",
+    "ACHIEVEMENT 5": "ranks/A5.jpg",
+    "ACHIEVEMENT 6": "ranks/A6.jpg",
+    "ACHIEVEMENT 7": "ranks/A6.jpg",
+    "ACHIEVEMENT 8": "ranks/A8.jpg"
+  };
+
+  return map[achievementNumber] || null;
+}
+
 function syncAchievementFields() {
   const achievementSelect = document.getElementById("achievementNumber");
   const titleInput = document.getElementById("achievementTitle");
@@ -69,6 +83,18 @@ function updatePreview() {
   document.getElementById("previewLeftSignerTitle").textContent = leftSignerTitle;
   document.getElementById("previewRightSignerName").textContent = rightSignerName;
   document.getElementById("previewRightSignerTitle").textContent = rightSignerTitle;
+
+  const rankImage = document.getElementById("previewRankImage");
+  if (rankImage) {
+    const imagePath = getRankImage(achievementNumber);
+    if (imagePath) {
+      rankImage.src = imagePath;
+      rankImage.style.display = "block";
+    } else {
+      rankImage.removeAttribute("src");
+      rankImage.style.display = "none";
+    }
+  }
 }
 
 /* ------------------ PDF ------------------ */
@@ -131,6 +157,22 @@ async function generatePDF() {
   drawCentered(achievementTitle, 0.342, 20, bold, blue);
   drawCentered(cadetName, 0.447, 28, serif, black);
   drawCentered(cadetRank, 0.533, 16, bold, blue);
+
+  const rankImagePath = getRankImage(achievementNumber);
+  if (rankImagePath) {
+    const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
+    const img = await pdfDoc.embedJpg(imgBytes);
+
+    const imgWidth = 72;
+    const imgHeight = (img.height / img.width) * imgWidth;
+
+    page.drawImage(img, {
+      x: width * 0.72,
+      y: height * 0.505,
+      width: imgWidth,
+      height: imgHeight
+    });
+  }
 
   const baseY = 0.66;
   const lineSpacing = 0.035;
