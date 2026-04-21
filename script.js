@@ -116,18 +116,22 @@ async function generatePDF() {
   drawCentered(cadetName, 0.447, 28, serif, black);
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
-  drawCentered(formatDate(promotionDate), 0.683, 12, bold, black);
+  drawCentered(
+    `Proudly Presented on this ${formatDate(promotionDate)}`,
+    0.683,
+    12,
+    bold,
+    black
+  );
+
   drawCentered(unitLine, 0.722, 12, bold, black);
 
-  // Signature line centers tuned to the actual template
   const leftSignatureCenter = 0.285;
-  const rightSignatureCenter = 0.720;
+  const rightSignatureCenter = 0.695;
 
-  // LEFT
   drawCenteredAt(leftSignerName, leftSignatureCenter, 0.878, 12, font);
   drawCenteredAt(leftSignerTitle, leftSignatureCenter, 0.91, 10, font);
 
-  // RIGHT
   drawCenteredAt(rightSignerName, rightSignatureCenter, 0.878, 12, font);
   drawCenteredAt(rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
 
