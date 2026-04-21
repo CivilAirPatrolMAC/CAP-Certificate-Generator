@@ -4,67 +4,88 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CAP Certificate Generator</title>
-
   <link rel="stylesheet" href="styles.css" />
-
-  <!-- PDF LIB -->
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 </head>
 <body>
+  <main class="app-shell">
+    <header class="page-header">
+      <div class="page-header__inner">
+        <p class="eyebrow">Civil Air Patrol • Brand Tools</p>
+        <h1>Achievement Certificate Generator</h1>
+        <p class="lede">Fill in the certificate details, preview the result, and download a completed PDF.</p>
+      </div>
+    </header>
 
-<main class="app-shell">
+    <section class="layout">
+      <div class="controls-column">
+        <article class="card">
+          <h2>Details</h2>
 
-  <header class="page-header">
-    <div class="page-header__inner">
-      <p class="eyebrow">Civil Air Patrol • Brand Tools</p>
-      <h1>Achievement Certificate Generator</h1>
-    </div>
-  </header>
+          <label for="achievementNumber">Achievement</label>
+          <input id="achievementNumber" value="ACHIEVEMENT 7" />
 
-  <section class="layout">
+          <label for="achievementTitle">Achievement Title</label>
+          <input id="achievementTitle" value="Dr. Robert Goddard" />
 
-    <div class="controls-column card">
+          <label for="cadetName">Cadet Name</label>
+          <input id="cadetName" value="Hanniah Beacham" />
 
-      <h2>Details</h2>
+          <label for="cadetRank">Cadet Rank</label>
+          <input id="cadetRank" value="CADET CHIEF MASTER SERGEANT" />
 
-      <label>Achievement</label>
-      <input id="achievementNumber" value="ACHIEVEMENT 7">
+          <label for="promotionDate">Date</label>
+          <input id="promotionDate" type="date" />
 
-      <label>Achievement Title</label>
-      <input id="achievementTitle" value="Dr. Robert Goddard">
+          <label for="unitLine">Unit Line</label>
+          <input id="unitLine" value="Fort Worth Composite Squadron, Fort Worth, Texas" />
 
-      <label>Cadet Name</label>
-      <input id="cadetName" value="Hanniah Beacham">
+          <label for="leftSignerName">Left Signature Name</label>
+          <input id="leftSignerName" value="Roman Vitanza" />
 
-      <label>Cadet Rank</label>
-      <input id="cadetRank" value="CADET CHIEF MASTER SERGEANT">
+          <label for="leftSignerTitle">Left Signature Title</label>
+          <input id="leftSignerTitle" value="Squadron Commander" />
 
-      <label>Date</label>
-      <input id="promotionDate" type="date">
+          <label for="rightSignerName">Right Signature Name</label>
+          <input id="rightSignerName" value="Joshua Bouldin" />
 
-      <label>Unit Line</label>
-      <input id="unitLine" value="Fort Worth Composite Squadron, Fort Worth, Texas">
+          <label for="rightSignerTitle">Right Signature Title</label>
+          <input id="rightSignerTitle" value="Deputy Commander for Cadets" />
 
-      <label>Left Signature Name</label>
-      <input id="leftSignerName" value="Roman Vitanza">
+          <div class="button-row">
+            <button id="downloadBtn" type="button">Download PDF</button>
+          </div>
+        </article>
+      </div>
 
-      <label>Left Signature Title</label>
-      <input id="leftSignerTitle" value="Squadron Commander">
+      <div class="preview-column">
+        <article class="card">
+          <h2>Live Preview</h2>
+          <p class="preview-subtitle">This preview updates as you type.</p>
 
-      <label>Right Signature Name</label>
-      <input id="rightSignerName" value="Joshua Bouldin">
+          <div class="preview-frame">
+            <div class="certificate-preview">
+              <img src="template-preview.png" alt="Certificate template preview" class="certificate-bg" />
 
-      <label>Right Signature Title</label>
-      <input id="rightSignerTitle" value="Deputy Commander for Cadets">
+              <div id="previewAchievementNumber" class="preview-text achievement-number">ACHIEVEMENT 7</div>
+              <div id="previewAchievementTitle" class="preview-text achievement-title">Dr. Robert Goddard</div>
+              <div id="previewCadetName" class="preview-text cadet-name">Hanniah Beacham</div>
+              <div id="previewCadetRank" class="preview-text cadet-rank">CADET CHIEF MASTER SERGEANT</div>
+              <div id="previewPresentedLine" class="preview-text presented-line">Proudly Presented on this 10th Day of January 2026</div>
+              <div id="previewUnitLine" class="preview-text unit-line">Fort Worth Composite Squadron, Fort Worth, Texas</div>
 
-      <button id="downloadBtn">Download PDF</button>
+              <div id="previewLeftSignerName" class="preview-text left-signer-name">Roman Vitanza</div>
+              <div id="previewLeftSignerTitle" class="preview-text left-signer-title">Squadron Commander</div>
 
-    </div>
+              <div id="previewRightSignerName" class="preview-text right-signer-name">Joshua Bouldin</div>
+              <div id="previewRightSignerTitle" class="preview-text right-signer-title">Deputy Commander for Cadets</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
 
-  </section>
-
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
