@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAP Promotion Certificate Generator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
+<header>
+  <h1>Promotion Certificate Generator</h1>
+</header>
+
+<div class="container">
+
+  <!-- FORM -->
+  <div class="card">
+    <label>Cadet Name</label>
+    <input id="name" placeholder="Cadet Name">
+
+    <label>Rank</label>
+    <select id="rank"></select>
+
+    <label>Date</label>
+    <input type="date" id="date">
+
+    <button id="printBtn">Print / Save PDF</button>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="card">
+    <div class="certificate">
+      <h2>Certificate of Promotion</h2>
+      <p>This certifies that</p>
+      <h1 id="previewName">Name</h1>
+      <p>has been promoted to</p>
+      <h3 id="previewRank">Rank</h3>
+      <p id="previewDate">Date</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
