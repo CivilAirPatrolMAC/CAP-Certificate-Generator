@@ -136,13 +136,13 @@ async function generatePDF() {
     return height * (1 - percent);
   }
 
-  function centerX(text, size, fontUsed) {
+  function centerXForText(text, size, fontUsed) {
     return (width - fontUsed.widthOfTextAtSize(text, size)) / 2;
   }
 
   function drawCentered(text, percentY, size, fontUsed, color) {
     page.drawText(text, {
-      x: centerX(text, size, fontUsed),
+      x: centerXForText(text, size, fontUsed),
       y: yPercent(percentY),
       size,
       font: fontUsed,
@@ -167,25 +167,31 @@ async function generatePDF() {
   drawCentered(cadetRank, 0.533, 16, bold, blue);
 
   const rankImagePath = getRankImage(achievementNumber);
-if (rankImagePath) {
-  const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
-  const img = await pdfDoc.embedJpg(imgBytes);
+  if (rankImagePath) {
+    const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
 
-  // Smaller size to better match the preview
-  const imgWidth = 70;
-  const imgHeight = (img.height / img.width) * imgWidth;
+    let img;
+    if (rankImagePath.toLowerCase().endsWith(".png")) {
+      img = await pdfDoc.embedPng(imgBytes);
+    } else {
+      img = await pdfDoc.embedJpg(imgBytes);
+    }
 
-  // Position by center point so it behaves more like the preview
-  const centerX = width * 0.22;
-  const centerY = height * 0.49;
+    // Increased from 70 to 100 so the printed insignia is noticeably larger
+    const imgWidth = 100;
+    const imgHeight = (img.height / img.width) * imgWidth;
 
-  page.drawImage(img, {
-    x: centerX - (imgWidth / 2),
-    y: centerY - (imgHeight / 2),
-    width: imgWidth,
-    height: imgHeight
-  });
-}
+    // Positioned by center point so scaling stays predictable
+    const centerX = width * 0.22;
+    const centerY = height * 0.49;
+
+    page.drawImage(img, {
+      x: centerX - (imgWidth / 2),
+      y: centerY - (imgHeight / 2),
+      width: imgWidth,
+      height: imgHeight
+    });
+  }
 
   const baseY = 0.66;
   const lineSpacing = 0.035;
