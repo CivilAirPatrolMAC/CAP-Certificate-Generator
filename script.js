@@ -36,7 +36,15 @@ function getRankImage(achievementNumber) {
     "ACHIEVEMENT 5": "ranks/A5.jpg",
     "ACHIEVEMENT 6": "ranks/A6.jpg",
     "ACHIEVEMENT 7": "ranks/A6.jpg",
-    "ACHIEVEMENT 8": "ranks/A8.jpg"
+    "ACHIEVEMENT 8": "ranks/A8.jpg",
+    "ACHIEVEMENT 9": "ranks/A9.jpg",
+    "ACHIEVEMENT 10": "ranks/A10.jpg",
+    "ACHIEVEMENT 11": "ranks/A11.jpg",
+    "ACHIEVEMENT 12": "ranks/A12.jpg",
+    "ACHIEVEMENT 13": "ranks/A13.jpg",
+    "ACHIEVEMENT 14": "ranks/A14.jpg",
+    "ACHIEVEMENT 15": "ranks/A15.jpg",
+    "ACHIEVEMENT 16": "ranks/A16.jpg"
   };
 
   return map[achievementNumber] || null;
