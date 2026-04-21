@@ -46,8 +46,10 @@ function updatePreview() {
   document.getElementById("previewAchievementTitle").textContent = achievementTitle;
   document.getElementById("previewCadetName").textContent = cadetName;
   document.getElementById("previewCadetRank").textContent = cadetRank;
+
   document.getElementById("previewPresentedLine").textContent =
     `Proudly Presented on this ${formatDate(promotionDate)}`;
+
   document.getElementById("previewUnitLine").textContent = unitLine;
 
   document.getElementById("previewLeftSignerName").textContent = leftSignerName;
@@ -84,7 +86,7 @@ async function generatePDF() {
   const blue = rgb(0.05, 0.18, 0.52);
   const black = rgb(0.1, 0.1, 0.1);
 
-  /* ---------- POSITION SYSTEM (MATCHES CSS %) ---------- */
+  /* ---------- POSITION SYSTEM ---------- */
 
   function yPercent(percent) {
     return height * (1 - percent);
@@ -104,17 +106,19 @@ async function generatePDF() {
     });
   }
 
-  function drawLeft(text, percentX, percentY, size, fontUsed) {
+  // NEW: center text under signature lines
+  function drawCenteredAt(text, centerPercentX, percentY, size, fontUsed, color = black) {
+    const textWidth = fontUsed.widthOfTextAtSize(text, size);
     page.drawText(text, {
-      x: width * percentX,
+      x: (width * centerPercentX) - (textWidth / 2),
       y: yPercent(percentY),
       size,
       font: fontUsed,
-      color: black
+      color
     });
   }
 
-  /* ---------- DRAW TEXT (MATCHES PREVIEW CSS) ---------- */
+  /* ---------- MAIN TEXT ---------- */
 
   drawCentered(achievementNumber, 0.245, 26, bold, blue);
   drawCentered(achievementTitle, 0.342, 20, bold, blue);
@@ -131,13 +135,15 @@ async function generatePDF() {
 
   drawCentered(unitLine, 0.684, 12, bold, black);
 
-  /* SIGNATURES */
+  /* ---------- SIGNATURES (CENTERED FIX) ---------- */
 
-  drawLeft(leftSignerName, 0.18, 0.878, 12, font);
-  drawLeft(leftSignerTitle, 0.16, 0.91, 10, font);
+  // LEFT SIGNATURE
+  drawCenteredAt(leftSignerName, 0.285, 0.878, 12, font);
+  drawCenteredAt(leftSignerTitle, 0.285, 0.91, 10, font);
 
-  drawLeft(rightSignerName, 0.68, 0.878, 12, font);
-  drawLeft(rightSignerTitle, 0.64, 0.91, 10, font);
+  // RIGHT SIGNATURE
+  drawCenteredAt(rightSignerName, 0.732, 0.878, 12, font);
+  drawCenteredAt(rightSignerTitle, 0.732, 0.91, 10, font);
 
   /* ---------- SAVE ---------- */
 
