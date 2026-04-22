@@ -1,19 +1,85 @@
 const { PDFDocument, StandardFonts, rgb } = PDFLib;
 
+const DEFAULTS = Object.freeze({
+  achievementNumber: "ACHIEVEMENT 7",
+  achievementTitle: "Dr. Robert Goddard",
+  cadetName: "Hanniah Beacham",
+  cadetRank: "Cadet Senior Master Sergeant",
+  unitLine: "Fort Worth Composite Squadron, Fort Worth, Texas",
+  leftSignerName: "Roman Vitanza",
+  leftSignerTitle: "Squadron Commander",
+  rightSignerName: "Joshua Bouldin",
+  rightSignerTitle: "Deputy Commander for Cadets"
+});
+
+const RANK_IMAGE_MAP = Object.freeze({
+  "ACHIEVEMENT 2": "ranks/A2.jpg",
+  "ACHIEVEMENT 3": "ranks/A3.jpg",
+  "ACHIEVEMENT 4": "ranks/A4.jpg",
+  "ACHIEVEMENT 5": "ranks/A5.jpg",
+  "ACHIEVEMENT 6": "ranks/A6.jpg",
+  "ACHIEVEMENT 7": "ranks/A6.jpg",
+  "ACHIEVEMENT 8": "ranks/A8.jpg",
+  "ACHIEVEMENT 9": "ranks/A9.jpg",
+  "ACHIEVEMENT 10": "ranks/A10.jpg",
+  "ACHIEVEMENT 11": "ranks/A11.jpg",
+  "ACHIEVEMENT 12": "ranks/A12.jpg",
+  "ACHIEVEMENT 13": "ranks/A13.jpg",
+  "ACHIEVEMENT 14": "ranks/A14.jpg",
+  "ACHIEVEMENT 15": "ranks/A15.jpg",
+  "ACHIEVEMENT 16": "ranks/A16.jpg"
+});
+
+const PREVIEW_MAP = Object.freeze({
+  achievementNumber: "previewAchievementNumber",
+  achievementTitle: "previewAchievementTitle",
+  cadetName: "previewCadetName",
+  cadetRank: "previewCadetRank",
+  unitLine: "previewUnitLine",
+  leftSignerName: "previewLeftSignerName",
+  leftSignerTitle: "previewLeftSignerTitle",
+  rightSignerName: "previewRightSignerName",
+  rightSignerTitle: "previewRightSignerTitle"
+});
+
 /* ------------------ HELPERS ------------------ */
 
+function byId(id) {
+  return document.getElementById(id);
+}
+
 function getValue(id, fallback = "") {
-  const el = document.getElementById(id);
+  const el = byId(id);
   return el ? el.value.trim() : fallback;
+}
+
+function getFormValues() {
+  return {
+    achievementNumber: getValue("achievementNumber", DEFAULTS.achievementNumber),
+    achievementTitle: getValue("achievementTitle", DEFAULTS.achievementTitle),
+    cadetName: getValue("cadetName", DEFAULTS.cadetName),
+    cadetRank: getValue("cadetRank", DEFAULTS.cadetRank),
+    promotionDate: getValue("promotionDate"),
+    unitLine: getValue("unitLine", DEFAULTS.unitLine),
+    leftSignerName: getValue("leftSignerName", DEFAULTS.leftSignerName),
+    leftSignerTitle: getValue("leftSignerTitle", DEFAULTS.leftSignerTitle),
+    rightSignerName: getValue("rightSignerName", DEFAULTS.rightSignerName),
+    rightSignerTitle: getValue("rightSignerTitle", DEFAULTS.rightSignerTitle)
+  };
 }
 
 function ordinal(n) {
   if (n % 100 >= 11 && n % 100 <= 13) return `${n}th`;
+
   switch (n % 10) {
-    case 1: return `${n}st`;
-    case 2: return `${n}nd`;
-    case 3: return `${n}rd`;
-    default: return `${n}th`;
+    case 1:
+      return `${n}st`;
+    case 2:
+      return `${n}nd`;
+    case 3:
+      return `${n}rd`;
+    default:
+      return `${n}th`;
   }
 }
 
@@ -29,95 +95,71 @@ function formatDate(value) {
 }
 
 function getRankImage(achievementNumber) {
-  const map = {
-    "ACHIEVEMENT 2": "ranks/A2.jpg",
-    "ACHIEVEMENT 3": "ranks/A3.jpg",
-    "ACHIEVEMENT 4": "ranks/A4.jpg",
-    "ACHIEVEMENT 5": "ranks/A5.jpg",
-    "ACHIEVEMENT 6": "ranks/A6.jpg",
-    "ACHIEVEMENT 7": "ranks/A6.jpg",
-    "ACHIEVEMENT 8": "ranks/A8.jpg",
-    "ACHIEVEMENT 9": "ranks/A9.jpg",
-    "ACHIEVEMENT 10": "ranks/A10.jpg",
-    "ACHIEVEMENT 11": "ranks/A11.jpg",
-    "ACHIEVEMENT 12": "ranks/A12.jpg",
-    "ACHIEVEMENT 13": "ranks/A13.jpg",
-    "ACHIEVEMENT 14": "ranks/A14.jpg",
-    "ACHIEVEMENT 15": "ranks/A15.jpg",
-    "ACHIEVEMENT 16": "ranks/A16.jpg"
-  };
-
-  return map[achievementNumber] || null;
+  return RANK_IMAGE_MAP[achievementNumber] || null;
 }
 
 function syncAchievementFields() {
-  const achievementSelect = document.getElementById("achievementNumber");
-  const titleInput = document.getElementById("achievementTitle");
-  const rankInput = document.getElementById("cadetRank");
+  const achievementSelect = byId("achievementNumber");
+  const titleInput = byId("achievementTitle");
+  const rankInput = byId("cadetRank");
 
-  const selectedOption = achievementSelect.options[achievementSelect.selectedIndex];
-  const title = selectedOption.dataset.title || "";
-  const rank = selectedOption.dataset.rank || "";
+  const selectedOption = achievementSelect?.options[achievementSelect.selectedIndex];
+  const title = selectedOption?.dataset.title || "";
+  const rank = selectedOption?.dataset.rank || "";
 
-  titleInput.value = title;
-  titleInput.disabled = !title;
+  if (titleInput) {
+    titleInput.value = title;
+    titleInput.disabled = !title;
+  }
 
-  rankInput.value = rank;
-  rankInput.disabled = true;
+  if (rankInput) {
+    rankInput.value = rank;
+    rankInput.disabled = true;
+  }
+}
+
+function setPreviewText(formValues) {
+  Object.entries(PREVIEW_MAP).forEach(([formKey, previewId]) => {
+    const previewNode = byId(previewId);
+    if (previewNode) {
+      previewNode.textContent = formValues[formKey];
+    }
+  });
+
+  const presentedLine = byId("previewPresentedLine");
+  if (presentedLine) {
+    presentedLine.textContent = `Proudly Presented on this ${formatDate(formValues.promotionDate)}`;
+  }
+}
+
+function setPreviewRankImage(achievementNumber) {
+  const rankImage = byId("previewRankImage");
+  if (!rankImage) return;
+
+  const imagePath = getRankImage(achievementNumber);
+
+  if (imagePath) {
+    rankImage.src = imagePath;
+    rankImage.style.display = "block";
+    return;
+  }
+
+  rankImage.removeAttribute("src");
+  rankImage.style.display = "none";
 }
 
 /* ------------------ PREVIEW ------------------ */
 
 function updatePreview() {
-  const achievementNumber = getValue("achievementNumber", "ACHIEVEMENT 7");
-  const achievementTitle = getValue("achievementTitle", "Dr. Robert Goddard");
-  const cadetName = getValue("cadetName", "Hanniah Beacham");
-  const cadetRank = getValue("cadetRank", "Cadet Senior Master Sergeant");
-  const promotionDate = getValue("promotionDate");
-  const unitLine = getValue("unitLine", "Fort Worth Composite Squadron, Fort Worth, Texas");
-  const leftSignerName = getValue("leftSignerName", "Roman Vitanza");
-  const leftSignerTitle = getValue("leftSignerTitle", "Squadron Commander");
-  const rightSignerName = getValue("rightSignerName", "Joshua Bouldin");
-  const rightSignerTitle = getValue("rightSignerTitle", "Deputy Commander for Cadets");
-
-  document.getElementById("previewAchievementNumber").textContent = achievementNumber;
-  document.getElementById("previewAchievementTitle").textContent = achievementTitle;
-  document.getElementById("previewCadetName").textContent = cadetName;
-  document.getElementById("previewCadetRank").textContent = cadetRank;
-  document.getElementById("previewPresentedLine").textContent =
-    `Proudly Presented on this ${formatDate(promotionDate)}`;
-  document.getElementById("previewUnitLine").textContent = unitLine;
-  document.getElementById("previewLeftSignerName").textContent = leftSignerName;
-  document.getElementById("previewLeftSignerTitle").textContent = leftSignerTitle;
-  document.getElementById("previewRightSignerName").textContent = rightSignerName;
-  document.getElementById("previewRightSignerTitle").textContent = rightSignerTitle;
-
-  const rankImage = document.getElementById("previewRankImage");
-  if (rankImage) {
-    const imagePath = getRankImage(achievementNumber);
-    if (imagePath) {
-      rankImage.src = imagePath;
-      rankImage.style.display = "block";
-    } else {
-      rankImage.removeAttribute("src");
-      rankImage.style.display = "none";
-    }
-  }
+  const formValues = getFormValues();
+  setPreviewText(formValues);
+  setPreviewRankImage(formValues.achievementNumber);
 }
 
 /* ------------------ PDF ------------------ */
 
 async function generatePDF() {
-  const achievementNumber = getValue("achievementNumber", "ACHIEVEMENT 7");
-  const achievementTitle = getValue("achievementTitle", "Dr. Robert Goddard");
-  const cadetName = getValue("cadetName", "Hanniah Beacham");
-  const cadetRank = getValue("cadetRank", "Cadet Senior Master Sergeant");
-  const promotionDate = getValue("promotionDate");
-  const unitLine = getValue("unitLine", "Fort Worth Composite Squadron, Fort Worth, Texas");
-  const leftSignerName = getValue("leftSignerName", "Roman Vitanza");
-  const leftSignerTitle = getValue("leftSignerTitle", "Squadron Commander");
-  const rightSignerName = getValue("rightSignerName", "Joshua Bouldin");
-  const rightSignerTitle = getValue("rightSignerTitle", "Deputy Commander for Cadets");
+  const formValues = getFormValues();
 
   const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -161,27 +203,21 @@ async function generatePDF() {
     });
   }
 
-  drawCentered(achievementNumber, 0.245, 26, bold, blue);
-  drawCentered(achievementTitle, 0.342, 20, bold, blue);
-  drawCentered(cadetName, 0.447, 28, serif, black);
-  drawCentered(cadetRank, 0.533, 16, bold, blue);
+  drawCentered(formValues.achievementNumber, 0.245, 26, bold, blue);
+  drawCentered(formValues.achievementTitle, 0.342, 20, bold, blue);
+  drawCentered(formValues.cadetName, 0.447, 28, serif, black);
+  drawCentered(formValues.cadetRank, 0.533, 16, bold, blue);
 
-  const rankImagePath = getRankImage(achievementNumber);
+  const rankImagePath = getRankImage(formValues.achievementNumber);
   if (rankImagePath) {
     const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
+    const img = rankImagePath.toLowerCase().endsWith(".png")
+      ? await pdfDoc.embedPng(imgBytes)
+      : await pdfDoc.embedJpg(imgBytes);
 
-    let img;
-    if (rankImagePath.toLowerCase().endsWith(".png")) {
-      img = await pdfDoc.embedPng(imgBytes);
-    } else {
-      img = await pdfDoc.embedJpg(imgBytes);
-    }
-
-    // Increased from 70 to 100 so the printed insignia is noticeably larger
     const imgWidth = 100;
     const imgHeight = (img.height / img.width) * imgWidth;
 
-    // Positioned by center point so scaling stays predictable
     const centerX = width * 0.22;
     const centerY = height * 0.49;
 
@@ -196,30 +232,16 @@ async function generatePDF() {
   const baseY = 0.66;
   const lineSpacing = 0.035;
 
-  drawCentered(
-    `Proudly Presented on this ${formatDate(promotionDate)}`,
-    baseY,
-    12,
-    bold,
-    black
-  );
-
-  drawCentered(
-    unitLine,
-    baseY + lineSpacing,
-    12,
-    bold,
-    black
-  );
+  drawCentered(`Proudly Presented on this ${formatDate(formValues.promotionDate)}`, baseY, 12, bold, black);
+  drawCentered(formValues.unitLine, baseY + lineSpacing, 12, bold, black);
 
   const leftSignatureCenter = 0.285;
   const rightSignatureCenter = 0.695;
 
-  drawCenteredAt(leftSignerName, leftSignatureCenter, 0.878, 12, font);
-  drawCenteredAt(leftSignerTitle, leftSignatureCenter, 0.91, 10, font);
-
-  drawCenteredAt(rightSignerName, rightSignatureCenter, 0.878, 12, font);
-  drawCenteredAt(rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
+  drawCenteredAt(formValues.leftSignerName, leftSignatureCenter, 0.878, 12, font);
+  drawCenteredAt(formValues.leftSignerTitle, leftSignatureCenter, 0.91, 10, font);
+  drawCenteredAt(formValues.rightSignerName, rightSignatureCenter, 0.878, 12, font);
+  drawCenteredAt(formValues.rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
 
   const finalBytes = await pdfDoc.save();
 
@@ -228,7 +250,7 @@ async function generatePDF() {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${cadetName.replace(/\s+/g, "-").toLowerCase()}-certificate.pdf`;
+  a.download = `${formValues.cadetName.replace(/\s+/g, "-").toLowerCase()}-certificate.pdf`;
   a.click();
 
   URL.revokeObjectURL(url);
@@ -236,28 +258,33 @@ async function generatePDF() {
 
 /* ------------------ EVENTS ------------------ */
 
-document.querySelectorAll("input, select").forEach((el) => {
-  el.addEventListener("input", () => {
-    if (el.id === "achievementNumber") {
-      syncAchievementFields();
-    }
-    updatePreview();
+function bindFormEvents() {
+  document.querySelectorAll("input, select").forEach((el) => {
+    const handler = () => {
+      if (el.id === "achievementNumber") {
+        syncAchievementFields();
+      }
+      updatePreview();
+    };
+
+    el.addEventListener("input", handler);
+    el.addEventListener("change", handler);
   });
-
-  el.addEventListener("change", () => {
-    if (el.id === "achievementNumber") {
-      syncAchievementFields();
-    }
-    updatePreview();
-  });
-});
-
-document.getElementById("downloadBtn").addEventListener("click", generatePDF);
-
-if (!document.getElementById("promotionDate").value) {
-  document.getElementById("promotionDate").value =
-    new Date().toISOString().slice(0, 10);
 }
 
-syncAchievementFields();
-updatePreview();
+function initializePromotionDate() {
+  const promotionDate = byId("promotionDate");
+  if (!promotionDate?.value) {
+    promotionDate.value = new Date().toISOString().slice(0, 10);
+  }
+}
+
+function initialize() {
+  syncAchievementFields();
+  initializePromotionDate();
+  bindFormEvents();
+  byId("downloadBtn")?.addEventListener("click", generatePDF);
+  updatePreview();
+}
+
+initialize();
