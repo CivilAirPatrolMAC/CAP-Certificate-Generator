@@ -46,6 +46,21 @@ const PREVIEW_MAP = Object.freeze({
   rightSignerTitle: "previewRightSignerTitle"
 });
 
+const GUIDANCE_ITEMS = Object.freeze({
+  promotion: [
+    "Verify the cadet’s full name, achievement, and promotion date.",
+    "Confirm the unit line appears exactly as it should on the certificate.",
+    "Review rank insignia, signature blocks, and spacing before downloading.",
+    "Use the live preview to confirm the final certificate layout.",
+    "Major milestone awards (Wright Brothers, Mitchell, Eaker, ect) will be mailed to the squadron commander and this tool should not be used to replace those"
+  ],
+  award: [
+    "Verify the member's full name, achievement, and award date",
+    "Confirm the unit line appears exactly as it should on the certificate.",
+    "Use the live preview to confirm the final certificate layout."
+  ]
+});
+
 /* ------------------ HELPERS ------------------ */
 
 function byId(id) {
@@ -199,6 +214,16 @@ function syncCertificateTypeFields() {
   if (awardFields) {
     awardFields.classList.toggle("hidden", certificateType !== "award");
   }
+
+  syncGuidanceChecklist(certificateType);
+}
+
+function syncGuidanceChecklist(certificateType) {
+  const checklist = byId("guidanceChecklist");
+  if (!checklist) return;
+
+  const guidanceItems = GUIDANCE_ITEMS[certificateType] || GUIDANCE_ITEMS.promotion;
+  checklist.innerHTML = guidanceItems.map((item) => `<li>${item}</li>`).join("");
 }
 
 /* ------------------ PDF ------------------ */
