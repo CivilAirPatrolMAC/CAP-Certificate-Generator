@@ -17,11 +17,11 @@
       <div class="page-header__inner">
         <div class="page-header__content">
           <p class="eyebrow">Civil Air Patrol Brand Tools</p>
-          <h1>Achievement Certificate Generator</h1>
+          <h1>CAP Certificate Generator</h1>
           <p class="lede">
-            Build and export Civil Air Patrol cadet achievement certificates.
-            Select an achievement, verify the auto-filled rank and title, enter cadet details,
-            preview the layout, and download a finalized PDF for presentation.
+            Build and export Civil Air Patrol certificates for cadet promotions and “of the year” awards.
+            Select a certificate type, complete the form fields, preview the layout,
+            and download a finalized PDF for presentation.
           </p>
         </div>
 
@@ -43,7 +43,7 @@
           </a>
 
           <a class="tool-nav__link tool-nav__link--active" href="#">
-            Achievement Certificate Generator
+            CAP Certificate Generator
           </a>
         </nav>
       </div>
@@ -60,8 +60,8 @@
           <div class="section-heading">
             <h2>Certificate Guidance</h2>
             <p>
-              Use the controls below to generate consistent, professional cadet achievement certificates
-              using the approved template, achievement structure, and rank associations.
+              Use the controls below to generate consistent, professional CAP certificates
+              for cadet promotions or “of the year” awards.
             </p>
           </div>
 
@@ -81,63 +81,82 @@
         <section class="card">
           <h2>Details</h2>
 
-          <label for="achievementNumber">Achievement</label>
-          <select id="achievementNumber">
-            <option value='ACHIEVEMENT 2' data-title='General "Hap" Arnold' data-rank="Cadet Airman First Class">
-              Achievement 2 - General "Hap" Arnold
-            </option>
-            <option value="ACHIEVEMENT 3" data-title="Mary Feik" data-rank="Cadet Senior Airman">
-              Achievement 3 - Mary Feik
-            </option>
-            <option value="ACHIEVEMENT 4" data-title="Capt. Eddie Rickenbacker" data-rank="Cadet Technical Sergeant">
-              Achievement 4 - Capt. Eddie Rickenbacker
-            </option>
-            <option value="ACHIEVEMENT 5" data-title="" data-rank="Cadet Master Sergeant">
-              Achievement 5
-            </option>
-            <option value="ACHIEVEMENT 6" data-title="Gen. Jimmy Doolittle" data-rank="Cadet Senior Master Sergeant">
-              Achievement 6 - Gen. Jimmy Doolittle
-            </option>
-            <option value="ACHIEVEMENT 7" data-title="Dr. Robert Goddard" data-rank="Cadet Senior Master Sergeant" selected>
-              Achievement 7 - Dr. Robert Goddard
-            </option>
-            <option value="ACHIEVEMENT 8" data-title="Neil Armstrong" data-rank="Cadet Chief Master Sergeant">
-              Achievement 8 - Neil Armstrong
-            </option>
-            <option value="ACHIEVEMENT 9" data-title="" data-rank="Cadet Second Lieutenant">
-              Achievement 9
-            </option>
-            <option value="ACHIEVEMENT 10" data-title="Willa Brown" data-rank="Cadet First Lieutenant">
-              Achievement 10 - Willa Brown
-            </option>
-            <option value="ACHIEVEMENT 11" data-title="" data-rank="Cadet First Lieutenant">
-              Achievement 11
-            </option>
-            <option value="ACHIEVEMENT 12" data-title="" data-rank="Cadet Captain">
-              Achievement 12
-            </option>
-            <option value="ACHIEVEMENT 13" data-title="" data-rank="Cadet Captain">
-              Achievement 13
-            </option>
-            <option value="ACHIEVEMENT 14" data-title="George Boyd" data-rank="Cadet Major">
-              Achievement 14 - George Boyd
-            </option>
-            <option value="ACHIEVEMENT 15" data-title="Sally Ride" data-rank="Cadet Major">
-              Achievement 15 - Sally Ride
-            </option>
-            <option value="ACHIEVEMENT 16" data-title="" data-rank="Cadet Major">
-              Achievement 16
-            </option>
+          <label for="certificateType">Certificate Type</label>
+          <select id="certificateType">
+            <option value="promotion" selected>Cadet Promotion</option>
+            <option value="award">Of the Year Awards</option>
           </select>
 
-          <label for="achievementTitle">Achievement Title</label>
-          <input id="achievementTitle" value="Dr. Robert Goddard" disabled />
+          <div id="promotionFields" class="form-section">
+            <label for="achievementNumber">Achievement</label>
+            <select id="achievementNumber">
+              <option value='ACHIEVEMENT 2' data-title='General "Hap" Arnold' data-rank="Cadet Airman First Class">
+                Achievement 2 - General "Hap" Arnold
+              </option>
+              <option value="ACHIEVEMENT 3" data-title="Mary Feik" data-rank="Cadet Senior Airman">
+                Achievement 3 - Mary Feik
+              </option>
+              <option value="ACHIEVEMENT 4" data-title="Capt. Eddie Rickenbacker" data-rank="Cadet Technical Sergeant">
+                Achievement 4 - Capt. Eddie Rickenbacker
+              </option>
+              <option value="ACHIEVEMENT 5" data-title="" data-rank="Cadet Master Sergeant">
+                Achievement 5
+              </option>
+              <option value="ACHIEVEMENT 6" data-title="Gen. Jimmy Doolittle" data-rank="Cadet Senior Master Sergeant">
+                Achievement 6 - Gen. Jimmy Doolittle
+              </option>
+              <option value="ACHIEVEMENT 7" data-title="Dr. Robert Goddard" data-rank="Cadet Senior Master Sergeant" selected>
+                Achievement 7 - Dr. Robert Goddard
+              </option>
+              <option value="ACHIEVEMENT 8" data-title="Neil Armstrong" data-rank="Cadet Chief Master Sergeant">
+                Achievement 8 - Neil Armstrong
+              </option>
+              <option value="ACHIEVEMENT 9" data-title="" data-rank="Cadet Second Lieutenant">
+                Achievement 9
+              </option>
+              <option value="ACHIEVEMENT 10" data-title="Willa Brown" data-rank="Cadet First Lieutenant">
+                Achievement 10 - Willa Brown
+              </option>
+              <option value="ACHIEVEMENT 11" data-title="" data-rank="Cadet First Lieutenant">
+                Achievement 11
+              </option>
+              <option value="ACHIEVEMENT 12" data-title="" data-rank="Cadet Captain">
+                Achievement 12
+              </option>
+              <option value="ACHIEVEMENT 13" data-title="" data-rank="Cadet Captain">
+                Achievement 13
+              </option>
+              <option value="ACHIEVEMENT 14" data-title="George Boyd" data-rank="Cadet Major">
+                Achievement 14 - George Boyd
+              </option>
+              <option value="ACHIEVEMENT 15" data-title="Sally Ride" data-rank="Cadet Major">
+                Achievement 15 - Sally Ride
+              </option>
+              <option value="ACHIEVEMENT 16" data-title="" data-rank="Cadet Major">
+                Achievement 16
+              </option>
+            </select>
 
-          <label for="cadetName">Cadet Name</label>
-          <input id="cadetName" value="Hanniah Beacham" />
+            <label for="achievementTitle">Achievement Title</label>
+            <input id="achievementTitle" value="Dr. Robert Goddard" disabled />
 
-          <label for="cadetRank">Cadet Rank</label>
-          <input id="cadetRank" disabled />
+            <label for="cadetName">Cadet Name</label>
+            <input id="cadetName" value="Hanniah Beacham" />
+
+            <label for="cadetRank">Cadet Rank</label>
+            <input id="cadetRank" disabled />
+          </div>
+
+          <div id="awardFields" class="form-section hidden">
+            <label for="awardCategory">Award Category</label>
+            <input id="awardCategory" value="Cadet of the Year" />
+
+            <label for="awardRecipient">Recipient Name</label>
+            <input id="awardRecipient" value="Hanniah Beacham" />
+
+            <label for="awardSubtitle">Award Subtitle</label>
+            <input id="awardSubtitle" value="For exceptional leadership and service" />
+          </div>
 
           <label for="promotionDate">Date earned in eServices</label>
           <input id="promotionDate" type="date" />
