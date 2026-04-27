@@ -230,6 +230,7 @@ function syncCertificateTypeFields() {
   const awardFields = byId("awardFields");
   const activityFields = byId("activityFields");
   const promotionDateLabel = byId("promotionDateLabel");
+  const unitLineLabel = byId("unitLineLabel");
 
   if (promotionFields) {
     promotionFields.classList.toggle("hidden", !isPromotion);
@@ -245,6 +246,10 @@ function syncCertificateTypeFields() {
 
   if (promotionDateLabel) {
     promotionDateLabel.textContent = isPromotion ? "Date earned in eServices" : "Date Earned";
+  }
+
+  if (unitLineLabel) {
+    unitLineLabel.textContent = isActivity ? "Activity Location" : "Unit Line";
   }
 
   syncGuidanceChecklist(certificateType);
