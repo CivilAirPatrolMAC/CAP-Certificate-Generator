@@ -231,6 +231,9 @@ function syncCertificateTypeFields() {
   const activityFields = byId("activityFields");
   const promotionDateLabel = byId("promotionDateLabel");
   const unitLineLabel = byId("unitLineLabel");
+  const unitLineHelp = byId("unitLineHelp");
+  const leftSignerTitleInput = byId("leftSignerTitle");
+  const rightSignerTitleInput = byId("rightSignerTitle");
 
   if (promotionFields) {
     promotionFields.classList.toggle("hidden", !isPromotion);
@@ -250,6 +253,20 @@ function syncCertificateTypeFields() {
 
   if (unitLineLabel) {
     unitLineLabel.textContent = isActivity ? "Activity Location" : "Unit Line";
+  }
+
+  if (unitLineHelp) {
+    unitLineHelp.textContent = isActivity
+      ? "Enter the full location name as it should appear on the certificate (e.g., Fort Wolters, Mineral Wells, Texas)."
+      : "Enter the full unit name and location as it should appear on the certificate (e.g., Squadron, City, State).";
+  }
+
+  if (leftSignerTitleInput) {
+    leftSignerTitleInput.placeholder = isActivity ? "Activity Director" : DEFAULTS.leftSignerTitle;
+  }
+
+  if (rightSignerTitleInput) {
+    rightSignerTitleInput.placeholder = isActivity ? "Deputy Director" : DEFAULTS.rightSignerTitle;
   }
 
   syncGuidanceChecklist(certificateType);
