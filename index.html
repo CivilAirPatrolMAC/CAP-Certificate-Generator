@@ -19,7 +19,7 @@
           <p class="eyebrow">Civil Air Patrol Brand Tools</p>
           <h1>Certificate Generator</h1>
           <p class="lede">
-            Build and export Civil Air Patrol certificates for cadet promotions and “of the year” awards.
+            Build and export Civil Air Patrol certificates for cadet promotions and activities.
             Select a certificate type, complete the form fields, preview the layout,
             and download a finalized PDF for presentation.
           </p>
@@ -61,7 +61,7 @@
             <h2>Certificate Guidance</h2>
             <p>
               Use the controls below to generate consistent, professional CAP certificates
-              for cadet promotions or “of the year” awards.
+              for cadet promotions or activities.
             </p>
           </div>
 
@@ -85,6 +85,7 @@
           <select id="certificateType">
             <option value="promotion" selected>Cadet Promotion</option>
             <option value="award">Of the Year Awards</option>
+            <option value="activities">Activities</option>
           </select>
 
           <div id="promotionFields" class="form-section">
@@ -175,6 +176,17 @@
 
             <label for="awardSubtitle">Award Subtitle</label>
             <input id="awardSubtitle" value="For exceptional leadership and service" />
+          </div>
+
+          <div id="activityFields" class="form-section hidden">
+            <label for="activityName">Activity Name</label>
+            <input id="activityName" value="Color Guard Competition" />
+
+            <label for="activityRecipient">Recipient Name</label>
+            <input id="activityRecipient" value="Hanniah Beacham" />
+
+            <label for="activitySubtitle">Award Subtitle</label>
+            <input id="activitySubtitle" value="For exceptional leadership and service" />
           </div>
 
           <label id="promotionDateLabel" for="promotionDate">Date earned in eServices</label>
