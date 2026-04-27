@@ -376,6 +376,13 @@ function triggerDownload(blob, fileName) {
   URL.revokeObjectURL(url);
 }
 
+function triggerDataUrlDownload(dataUrl, fileName) {
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = fileName;
+  a.click();
+}
+
 function escapeCsvCell(value) {
   const content = String(value ?? "");
   if (/[,"\n]/.test(content)) {
@@ -587,21 +594,150 @@ async function generatePDFBytes(values) {
   drawCenteredAt(formValues.rightSignerName, 0.737, 0.874, 12, font);
   drawCenteredAt(formValues.rightSignerTitle, 0.737, 0.91, 10, font);
 
-  return pdfDoc.save();
+  return pdfDoc.save({ useObjectStreams: true });
 }
 
-async function generatePDF() {
+async function generatePrintQualityPDFBytes(values) {
+  const formValues = values.certificateType === "promotion" ? resolvePromotionFields(values) : values;
+  const isPromotion = formValues.certificateType === "promotion";
+  const isAward = formValues.certificateType === "award";
+
+  if (containsBlockedTerms(collectCertificateText(formValues))) {
+    throw new Error("Certificate contains blocked terms.");
+  }
+
+  const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const page = pdfDoc.getPages()[0];
+
+  const { width, height } = page.getSize();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const serif = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+
+  const blue = rgb(0.05, 0.18, 0.52);
+  const black = rgb(0.1, 0.1, 0.1);
+  const yPercent = (percent) => height * (1 - percent);
+  const centerXForText = (text, size, fontUsed) => (width - fontUsed.widthOfTextAtSize(text, size)) / 2;
+  const drawCentered = (text, percentY, size, fontUsed, color) => {
+    page.drawText(text, { x: centerXForText(text, size, fontUsed), y: yPercent(percentY), size, font: fontUsed, color });
+  };
+
+  function splitTextIntoLines(text, maxWidth, size, fontUsed) {
+    const words = text.trim().split(/\s+/);
+    const lines = [];
+    let currentLine = "";
+    words.forEach((word) => {
+      const candidate = currentLine ? `${currentLine} ${word}` : word;
+      if (fontUsed.widthOfTextAtSize(candidate, size) <= maxWidth) {
+        currentLine = candidate;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+    if (currentLine) lines.push(currentLine);
+    return lines.length ? lines : [text];
+  }
+
+  function drawCenteredWrapped(text, percentY, size, fontUsed, color, maxWidth, lineHeightPercent = 0.035) {
+    const lines = splitTextIntoLines(text, maxWidth, size, fontUsed);
+    const lineOffset = ((lines.length - 1) * lineHeightPercent) / 2;
+    lines.forEach((line, index) => drawCentered(line, percentY - lineOffset + (index * lineHeightPercent), size, fontUsed, color));
+  }
+
+  function drawCenteredAt(text, centerPercentX, percentY, size, fontUsed, color = black) {
+    const textWidth = fontUsed.widthOfTextAtSize(text, size);
+    page.drawText(text, {
+      x: (width * centerPercentX) - (textWidth / 2),
+      y: yPercent(percentY),
+      size,
+      font: fontUsed,
+      color
+    });
+  }
+
+  const certificateHeading = isPromotion ? formValues.achievementNumber : isAward ? formValues.awardCategory : formValues.activityName;
+  const certificateTitle = isPromotion ? formValues.achievementTitle : "";
+  const recipientName = isPromotion ? formValues.cadetName : isAward ? formValues.awardRecipient : formValues.activityRecipient;
+  const recipientLine = isPromotion ? formValues.cadetRank : isAward ? formValues.awardSubtitle : formValues.activitySubtitle;
+
+  drawCenteredWrapped(certificateHeading, 0.245, 26, bold, blue, width * 0.84, 0.04);
+  if (certificateTitle) drawCentered(certificateTitle, 0.342, 20, bold, blue);
+  drawCentered(recipientName, isPromotion ? 0.447 : 0.418, 28, serif, black);
+  drawCentered(recipientLine, isPromotion ? 0.533 : 0.505, 16, bold, blue);
+
+  const rankImagePath = isPromotion ? getRankImage(formValues.achievementNumber) : null;
+  if (rankImagePath) {
+    const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
+    const img = rankImagePath.toLowerCase().endsWith(".png") ? await pdfDoc.embedPng(imgBytes) : await pdfDoc.embedJpg(imgBytes);
+    const imgWidth = 100;
+    const imgHeight = (img.height / img.width) * imgWidth;
+    page.drawImage(img, {
+      x: (width * 0.22) - (imgWidth / 2),
+      y: (height * 0.49) - (imgHeight / 2),
+      width: imgWidth,
+      height: imgHeight
+    });
+  }
+
+  const presentationLine = isPromotion
+    ? `Proudly Presented on this ${formatDate(formValues.promotionDate)}`
+    : `Recognized on this ${formatDate(formValues.promotionDate)}`;
+
+  drawCentered(presentationLine, 0.66, 12, bold, black);
+  drawCentered(formValues.unitLine, 0.695, 12, bold, black);
+  drawCenteredAt(formValues.leftSignerName, 0.285, 0.874, 12, font);
+  drawCenteredAt(formValues.leftSignerTitle, 0.285, 0.91, 10, font);
+  drawCenteredAt(formValues.rightSignerName, 0.737, 0.874, 12, font);
+  drawCenteredAt(formValues.rightSignerTitle, 0.737, 0.91, 10, font);
+
+  return pdfDoc.save({ useObjectStreams: false, addDefaultPage: false });
+}
+
+function getRecipientName(formValues) {
+  return formValues.certificateType === "promotion"
+    ? formValues.cadetName
+    : formValues.certificateType === "award"
+      ? formValues.awardRecipient
+      : formValues.activityRecipient;
+}
+
+async function generatePNG(formValues) {
+  if (!window.html2canvas) {
+    throw new Error("PNG export requires html2canvas.");
+  }
+
+  const previewNode = document.querySelector(".certificate-preview");
+  if (!previewNode) {
+    throw new Error("Preview container missing.");
+  }
+
+  const canvas = await window.html2canvas(previewNode, {
+    backgroundColor: "#ffffff",
+    scale: 3,
+    useCORS: true
+  });
+
+  const fileName = `${sanitizeFileName(getRecipientName(formValues))}-certificate.png`;
+  triggerDataUrlDownload(canvas.toDataURL("image/png"), fileName);
+}
+
+async function generateExport() {
   const formValues = getFormValues();
+  const exportFormat = getValue("exportFormat", "pdf");
 
   try {
-    const finalBytes = await generatePDFBytes(formValues);
-    const recipient = formValues.certificateType === "promotion"
-      ? formValues.cadetName
-      : formValues.certificateType === "award"
-        ? formValues.awardRecipient
-        : formValues.activityRecipient;
+    if (exportFormat === "png") {
+      await generatePNG(formValues);
+      return;
+    }
 
-    triggerDownload(new Blob([finalBytes], { type: "application/pdf" }), `${sanitizeFileName(recipient)}-certificate.pdf`);
+    const finalBytes = exportFormat === "pdf-print"
+      ? await generatePrintQualityPDFBytes(formValues)
+      : await generatePDFBytes(formValues);
+
+    triggerDownload(new Blob([finalBytes], { type: "application/pdf" }), `${sanitizeFileName(getRecipientName(formValues))}-certificate.pdf`);
   } catch (error) {
     if (String(error.message || "").includes("blocked terms")) {
       downloadNonsenseImage();
@@ -721,7 +857,7 @@ function initialize() {
   initializePromotionDate();
   bindFormEvents();
   bindBulkEvents();
-  byId("downloadBtn")?.addEventListener("click", generatePDF);
+  byId("downloadBtn")?.addEventListener("click", generateExport);
   updatePreview();
 }
 

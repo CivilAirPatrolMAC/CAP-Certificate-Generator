@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -213,8 +214,15 @@
           <label for="rightSignerTitle">Right Signature Title</label>
           <input id="rightSignerTitle" value="Deputy Commander" placeholder="Deputy Commander" />
 
+          <label for="exportFormat">Export Format</label>
+          <select id="exportFormat">
+            <option value="pdf" selected>PDF (standard)</option>
+            <option value="pdf-print">PDF (print quality)</option>
+            <option value="png">PNG</option>
+          </select>
+
           <div class="button-row">
-            <button id="downloadBtn" type="button">Download PDF</button>
+            <button id="downloadBtn" type="button">Download</button>
           </div>
           <div class="bulk-tools" aria-label="Bulk certificate generation">
             <h3>Bulk CSV Generation</h3>
