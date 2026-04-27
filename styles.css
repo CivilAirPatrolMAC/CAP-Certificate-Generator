@@ -230,6 +230,9 @@ button:hover {
   font-weight: 800;
   color: #0a2c85;
   letter-spacing: 0.03em;
+  width: 84%;
+  white-space: normal;
+  line-height: 1.15;
 }
 
 .achievement-title {
