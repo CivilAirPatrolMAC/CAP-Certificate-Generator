@@ -9,6 +9,9 @@ const DEFAULTS = Object.freeze({
   awardCategory: "Cadet of the Year",
   awardRecipient: "Hanniah Beacham",
   awardSubtitle: "For exceptional leadership and service",
+  activityName: "Color Guard Competition",
+  activityRecipient: "Hanniah Beacham",
+  activitySubtitle: "For exceptional leadership and service",
   unitLine: "Fort Worth Composite Squadron, Fort Worth, Texas",
   leftSignerName: "Roman Vitanza",
   leftSignerTitle: "Squadron Commander",
@@ -55,7 +58,12 @@ const GUIDANCE_ITEMS = Object.freeze({
     "Major milestone awards (Wright Brothers, Mitchell, Eaker, ect) will be mailed to the squadron commander and this tool should not be used to replace those"
   ],
   award: [
-    "Verify the member's full name, achievement, and award date",
+    "Verify the member's full name, achievement, and award date.",
+    "Confirm the unit line appears exactly as it should on the certificate.",
+    "Use the live preview to confirm the final certificate layout."
+  ],
+  activities: [
+    "Verify the member's full name, activity name, and recognition date.",
     "Confirm the unit line appears exactly as it should on the certificate.",
     "Use the live preview to confirm the final certificate layout."
   ]
@@ -82,6 +90,9 @@ function getFormValues() {
     awardCategory: getValue("awardCategory", DEFAULTS.awardCategory),
     awardRecipient: getValue("awardRecipient", DEFAULTS.awardRecipient),
     awardSubtitle: getValue("awardSubtitle", DEFAULTS.awardSubtitle),
+    activityName: getValue("activityName", DEFAULTS.activityName),
+    activityRecipient: getValue("activityRecipient", DEFAULTS.activityRecipient),
+    activitySubtitle: getValue("activitySubtitle", DEFAULTS.activitySubtitle),
     promotionDate: getValue("promotionDate"),
     unitLine: getValue("unitLine", DEFAULTS.unitLine),
     leftSignerName: getValue("leftSignerName", DEFAULTS.leftSignerName),
@@ -143,6 +154,7 @@ function syncAchievementFields() {
 
 function setPreviewText(formValues) {
   const isPromotion = formValues.certificateType === "promotion";
+  const isAward = formValues.certificateType === "award";
   const previewValues = isPromotion
     ? {
         achievementNumber: formValues.achievementNumber,
@@ -150,12 +162,19 @@ function setPreviewText(formValues) {
         cadetName: formValues.cadetName,
         cadetRank: formValues.cadetRank
       }
-    : {
-        achievementNumber: formValues.awardCategory,
-        achievementTitle: "",
-        cadetName: formValues.awardRecipient,
-        cadetRank: formValues.awardSubtitle
-      };
+    : isAward
+      ? {
+          achievementNumber: formValues.awardCategory,
+          achievementTitle: "",
+          cadetName: formValues.awardRecipient,
+          cadetRank: formValues.awardSubtitle
+        }
+      : {
+          achievementNumber: formValues.activityName,
+          achievementTitle: "",
+          cadetName: formValues.activityRecipient,
+          cadetRank: formValues.activitySubtitle
+        };
 
   Object.entries(PREVIEW_MAP).forEach(([formKey, previewId]) => {
     const previewNode = byId(previewId);
@@ -194,7 +213,7 @@ function setPreviewRankImage(achievementNumber) {
 function updatePreview() {
   const formValues = getFormValues();
   const certificatePreview = document.querySelector(".certificate-preview");
-  certificatePreview?.classList.toggle("award-mode", formValues.certificateType === "award");
+  certificatePreview?.classList.toggle("award-mode", formValues.certificateType !== "promotion");
   setPreviewText(formValues);
   const selectedAchievement = formValues.certificateType === "promotion"
     ? formValues.achievementNumber
@@ -205,25 +224,27 @@ function updatePreview() {
 function syncCertificateTypeFields() {
   const certificateType = getValue("certificateType", DEFAULTS.certificateType);
   const isPromotion = certificateType === "promotion";
+  const isAward = certificateType === "award";
+  const isActivity = certificateType === "activities";
   const promotionFields = byId("promotionFields");
   const awardFields = byId("awardFields");
+  const activityFields = byId("activityFields");
   const promotionDateLabel = byId("promotionDateLabel");
-  const awardSubtitle = byId("awardSubtitle");
 
   if (promotionFields) {
     promotionFields.classList.toggle("hidden", !isPromotion);
   }
 
   if (awardFields) {
-    awardFields.classList.toggle("hidden", isPromotion);
+    awardFields.classList.toggle("hidden", !isAward);
+  }
+
+  if (activityFields) {
+    activityFields.classList.toggle("hidden", !isActivity);
   }
 
   if (promotionDateLabel) {
     promotionDateLabel.textContent = isPromotion ? "Date earned in eServices" : "Date Earned";
-  }
-
-  if (awardSubtitle) {
-    awardSubtitle.disabled = !isPromotion;
   }
 
   syncGuidanceChecklist(certificateType);
@@ -242,6 +263,7 @@ function syncGuidanceChecklist(certificateType) {
 async function generatePDF() {
   const formValues = getFormValues();
   const isPromotion = formValues.certificateType === "promotion";
+  const isAward = formValues.certificateType === "award";
 
   const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -319,10 +341,22 @@ async function generatePDF() {
     });
   }
 
-  const certificateHeading = isPromotion ? formValues.achievementNumber : formValues.awardCategory;
+  const certificateHeading = isPromotion
+    ? formValues.achievementNumber
+    : isAward
+      ? formValues.awardCategory
+      : formValues.activityName;
   const certificateTitle = isPromotion ? formValues.achievementTitle : "";
-  const recipientName = isPromotion ? formValues.cadetName : formValues.awardRecipient;
-  const recipientLine = isPromotion ? formValues.cadetRank : formValues.awardSubtitle;
+  const recipientName = isPromotion
+    ? formValues.cadetName
+    : isAward
+      ? formValues.awardRecipient
+      : formValues.activityRecipient;
+  const recipientLine = isPromotion
+    ? formValues.cadetRank
+    : isAward
+      ? formValues.awardSubtitle
+      : formValues.activitySubtitle;
   const recipientNameY = isPromotion ? 0.447 : 0.418;
   const recipientLineY = isPromotion ? 0.533 : 0.505;
 
@@ -378,7 +412,11 @@ async function generatePDF() {
 
   const a = document.createElement("a");
   a.href = url;
-  const fileNameBase = (isPromotion ? formValues.cadetName : formValues.awardRecipient)
+  const fileNameBase = (isPromotion
+    ? formValues.cadetName
+    : isAward
+      ? formValues.awardRecipient
+      : formValues.activityRecipient)
     .replace(/\s+/g, "-")
     .toLowerCase();
   a.download = `${fileNameBase}-certificate.pdf`;
