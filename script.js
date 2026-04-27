@@ -49,6 +49,36 @@ const PREVIEW_MAP = Object.freeze({
   rightSignerTitle: "previewRightSignerTitle"
 });
 
+const BLOCKED_TERMS = Object.freeze([
+  "ass", "asshole", "asswipe", "assclown", "assface", "asshat", "assbag", "asslicker", "asskisser", "assholeish",
+  "bastard", "bastards",
+  "bitch", "bitches", "bitchy",
+  "bullshit", "bullshitter",
+  "crap", "crappy",
+  "damn", "dammit", "damnation",
+  "dumbass", "dumbasses",
+  "fuck", "fucks", "fucked", "fucking", "fucker", "fuckers", "fuckface", "fuckhead", "fuckwit", "fuckup", "fuckboy",
+  "shit", "shits", "shitted", "shitting", "shitty", "shithead", "shitface", "shitbag", "shitshow", "shitstorm", "shitfaced",
+  "piss", "pissed", "pissing", "pisser", "pisshead",
+  "dick", "dicks", "dickhead", "dickbag", "dickface",
+  "prick", "pricks",
+  "jerk", "jerks",
+  "jackass", "jackasses",
+  "motherfucker", "motherfuckers", "mf",
+  "son of a bitch", "sonofabitch", "sob",
+  "goddamn", "goddammit", "goddamned",
+  "dipshit", "dipshits",
+  "clusterfuck", "clusterfucks"
+]);
+
+const BLOCKED_TERMS_REGEX = new RegExp(
+  `\\b(?:${BLOCKED_TERMS.map((term) => term
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\s+/g, "\\s+"))
+    .join("|")})\\b`,
+  "i"
+);
+
 const GUIDANCE_ITEMS = Object.freeze({
   promotion: [
     "Verify the cadet’s full name, achievement, and promotion date.",
@@ -280,12 +310,48 @@ function syncGuidanceChecklist(certificateType) {
   checklist.innerHTML = guidanceItems.map((item) => `<li>${item}</li>`).join("");
 }
 
+function collectCertificateText(formValues) {
+  const isPromotion = formValues.certificateType === "promotion";
+  const isAward = formValues.certificateType === "award";
+
+  const variableText = isPromotion
+    ? [formValues.achievementNumber, formValues.achievementTitle, formValues.cadetName, formValues.cadetRank]
+    : isAward
+      ? [formValues.awardCategory, formValues.awardRecipient, formValues.awardSubtitle]
+      : [formValues.activityName, formValues.activityRecipient, formValues.activitySubtitle];
+
+  return [
+    ...variableText,
+    formValues.unitLine,
+    formValues.leftSignerName,
+    formValues.leftSignerTitle,
+    formValues.rightSignerName,
+    formValues.rightSignerTitle
+  ].join(" ");
+}
+
+function containsBlockedTerms(text) {
+  return BLOCKED_TERMS_REGEX.test(text);
+}
+
+function downloadNonsenseImage() {
+  const a = document.createElement("a");
+  a.href = "nonsense.png";
+  a.download = "nonsense.png";
+  a.click();
+}
+
 /* ------------------ PDF ------------------ */
 
 async function generatePDF() {
   const formValues = getFormValues();
   const isPromotion = formValues.certificateType === "promotion";
   const isAward = formValues.certificateType === "award";
+
+  if (containsBlockedTerms(collectCertificateText(formValues))) {
+    downloadNonsenseImage();
+    return;
+  }
 
   const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(pdfBytes);
