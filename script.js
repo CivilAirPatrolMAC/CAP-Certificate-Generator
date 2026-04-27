@@ -136,8 +136,8 @@ function setPreviewText(formValues) {
         cadetRank: formValues.cadetRank
       }
     : {
-        achievementNumber: "OF THE YEAR AWARD",
-        achievementTitle: formValues.awardCategory,
+        achievementNumber: formValues.awardCategory,
+        achievementTitle: "OF THE YEAR AWARD",
         cadetName: formValues.awardRecipient,
         cadetRank: formValues.awardSubtitle
       };
@@ -246,8 +246,8 @@ async function generatePDF() {
     });
   }
 
-  const certificateHeading = isPromotion ? formValues.achievementNumber : "OF THE YEAR AWARD";
-  const certificateTitle = isPromotion ? formValues.achievementTitle : formValues.awardCategory;
+  const certificateHeading = isPromotion ? formValues.achievementNumber : formValues.awardCategory;
+  const certificateTitle = isPromotion ? formValues.achievementTitle : "OF THE YEAR AWARD";
   const recipientName = isPromotion ? formValues.cadetName : formValues.awardRecipient;
   const recipientLine = isPromotion ? formValues.cadetRank : formValues.awardSubtitle;
 
