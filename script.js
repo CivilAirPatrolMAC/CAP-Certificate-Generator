@@ -420,12 +420,12 @@ async function generatePDF() {
   drawCentered(formValues.unitLine, baseY + lineSpacing, 12, bold, black);
 
   const leftSignatureCenter = 0.285;
-  const rightSignatureCenter = 0.695;
+  const rightSignatureCenter = 0.737;
 
-  drawCenteredAt(formValues.leftSignerName, leftSignatureCenter, 0.878, 12, font);
+  drawCenteredAt(formValues.leftSignerName, leftSignatureCenter, 0.874, 12, font);
   drawCenteredAt(formValues.leftSignerTitle, leftSignatureCenter, 0.91, 10, font);
-  drawCenteredAt(formValues.rightSignerName, rightSignatureCenter, 0.878, 12, font);
-  drawCenteredAt(formValues.rightSignerTitle, rightSignatureCenter - 0.003, 0.91, 10, font);
+  drawCenteredAt(formValues.rightSignerName, rightSignatureCenter, 0.874, 12, font);
+  drawCenteredAt(formValues.rightSignerTitle, rightSignatureCenter, 0.91, 10, font);
 
   const finalBytes = await pdfDoc.save();
 
