@@ -37,6 +37,30 @@ const RANK_IMAGE_MAP = Object.freeze({
   "ACHIEVEMENT 16": "ranks/A16.jpg"
 });
 
+const CSV_FIELDS = Object.freeze({
+  promotion: [
+    "achievementNumber",
+    "cadetName",
+    "promotionDate",
+    "unitLine",
+    "leftSignerName",
+    "leftSignerTitle",
+    "rightSignerName",
+    "rightSignerTitle"
+  ],
+  activities: [
+    "activityName",
+    "activityRecipient",
+    "activitySubtitle",
+    "promotionDate",
+    "unitLine",
+    "leftSignerName",
+    "leftSignerTitle",
+    "rightSignerName",
+    "rightSignerTitle"
+  ]
+});
+
 const PREVIEW_MAP = Object.freeze({
   achievementNumber: "previewAchievementNumber",
   achievementTitle: "previewAchievementTitle",
@@ -99,8 +123,6 @@ const GUIDANCE_ITEMS = Object.freeze({
   ]
 });
 
-/* ------------------ HELPERS ------------------ */
-
 function byId(id) {
   return document.getElementById(id);
 }
@@ -134,32 +156,38 @@ function getFormValues() {
 
 function ordinal(n) {
   if (n % 100 >= 11 && n % 100 <= 13) return `${n}th`;
-
   switch (n % 10) {
-    case 1:
-      return `${n}st`;
-    case 2:
-      return `${n}nd`;
-    case 3:
-      return `${n}rd`;
-    default:
-      return `${n}th`;
+    case 1: return `${n}st`;
+    case 2: return `${n}nd`;
+    case 3: return `${n}rd`;
+    default: return `${n}th`;
   }
 }
 
 function formatDate(value) {
   if (!value) return "10th Day of January 2026";
-
   const d = new Date(`${value}T00:00:00`);
   const day = d.getDate();
   const month = d.toLocaleDateString("en-US", { month: "long" });
   const year = d.getFullYear();
-
   return `${ordinal(day)} Day of ${month} ${year}`;
 }
 
 function getRankImage(achievementNumber) {
   return RANK_IMAGE_MAP[achievementNumber] || null;
+}
+
+function resolvePromotionFields(formValues) {
+  const achievementSelect = byId("achievementNumber");
+  const option = achievementSelect
+    ? Array.from(achievementSelect.options).find((candidate) => candidate.value === formValues.achievementNumber)
+    : null;
+
+  return {
+    ...formValues,
+    achievementTitle: formValues.achievementTitle || option?.dataset.title || "",
+    cadetRank: formValues.cadetRank || option?.dataset.rank || ""
+  };
 }
 
 function syncAchievementFields() {
@@ -227,7 +255,6 @@ function setPreviewRankImage(achievementNumber) {
   if (!rankImage) return;
 
   const imagePath = getRankImage(achievementNumber);
-
   if (imagePath) {
     rankImage.src = imagePath;
     rankImage.style.display = "block";
@@ -238,17 +265,12 @@ function setPreviewRankImage(achievementNumber) {
   rankImage.style.display = "none";
 }
 
-/* ------------------ PREVIEW ------------------ */
-
 function updatePreview() {
   const formValues = getFormValues();
   const certificatePreview = document.querySelector(".certificate-preview");
   certificatePreview?.classList.toggle("award-mode", formValues.certificateType !== "promotion");
   setPreviewText(formValues);
-  const selectedAchievement = formValues.certificateType === "promotion"
-    ? formValues.achievementNumber
-    : "";
-  setPreviewRankImage(selectedAchievement);
+  setPreviewRankImage(formValues.certificateType === "promotion" ? formValues.achievementNumber : "");
 }
 
 function syncCertificateTypeFields() {
@@ -264,27 +286,18 @@ function syncCertificateTypeFields() {
   const unitLineHelp = byId("unitLineHelp");
   const leftSignerTitleInput = byId("leftSignerTitle");
   const rightSignerTitleInput = byId("rightSignerTitle");
+  const bulkStatus = byId("bulkStatus");
 
-  if (promotionFields) {
-    promotionFields.classList.toggle("hidden", !isPromotion);
-  }
-
-  if (awardFields) {
-    awardFields.classList.toggle("hidden", !isAward);
-  }
-
-  if (activityFields) {
-    activityFields.classList.toggle("hidden", !isActivity);
-  }
+  promotionFields?.classList.toggle("hidden", !isPromotion);
+  awardFields?.classList.toggle("hidden", !isAward);
+  activityFields?.classList.toggle("hidden", !isActivity);
 
   if (promotionDateLabel) {
     promotionDateLabel.textContent = isPromotion ? "Date earned in eServices" : "Date Earned";
   }
-
   if (unitLineLabel) {
     unitLineLabel.textContent = isActivity ? "Activity Location" : "Unit Line";
   }
-
   if (unitLineHelp) {
     unitLineHelp.textContent = isActivity
       ? "Enter the full location name as it should appear on the certificate (e.g., Fort Wolters, Mineral Wells, Texas)."
@@ -294,9 +307,14 @@ function syncCertificateTypeFields() {
   if (leftSignerTitleInput) {
     leftSignerTitleInput.placeholder = isActivity ? "Activity Director" : DEFAULTS.leftSignerTitle;
   }
-
   if (rightSignerTitleInput) {
     rightSignerTitleInput.placeholder = isActivity ? "Deputy Director" : DEFAULTS.rightSignerTitle;
+  }
+
+  if (bulkStatus && isAward) {
+    bulkStatus.textContent = "Bulk CSV mode currently supports Promotion and Activities certificate types.";
+  } else if (bulkStatus) {
+    bulkStatus.textContent = "";
   }
 
   syncGuidanceChecklist(certificateType);
@@ -305,7 +323,6 @@ function syncCertificateTypeFields() {
 function syncGuidanceChecklist(certificateType) {
   const checklist = byId("guidanceChecklist");
   if (!checklist) return;
-
   const guidanceItems = GUIDANCE_ITEMS[certificateType] || GUIDANCE_ITEMS.promotion;
   checklist.innerHTML = guidanceItems.map((item) => `<li>${item}</li>`).join("");
 }
@@ -341,16 +358,141 @@ function downloadNonsenseImage() {
   a.click();
 }
 
-/* ------------------ PDF ------------------ */
+function sanitizeFileName(value, fallback = "certificate") {
+  const base = (value || fallback)
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+  return base || fallback;
+}
 
-async function generatePDF() {
-  const formValues = getFormValues();
+function triggerDownload(blob, fileName) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeCsvCell(value) {
+  const content = String(value ?? "");
+  if (/[,"\n]/.test(content)) {
+    return `"${content.replace(/"/g, '""')}"`;
+  }
+  return content;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        field += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (char === "," && !inQuotes) {
+      row.push(field.trim());
+      field = "";
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") {
+        i += 1;
+      }
+      row.push(field.trim());
+      if (row.some((cell) => cell !== "")) {
+        rows.push(row);
+      }
+      row = [];
+      field = "";
+      continue;
+    }
+
+    field += char;
+  }
+
+  if (field || row.length) {
+    row.push(field.trim());
+    if (row.some((cell) => cell !== "")) {
+      rows.push(row);
+    }
+  }
+
+  return rows;
+}
+
+function getCsvHeaders(certificateType) {
+  return CSV_FIELDS[certificateType] || null;
+}
+
+function downloadCsvTemplate() {
+  const certificateType = getValue("certificateType", DEFAULTS.certificateType);
+  const headers = getCsvHeaders(certificateType);
+  const status = byId("bulkStatus");
+
+  if (!headers) {
+    if (status) status.textContent = "CSV templates are available for Promotion and Activities only.";
+    return;
+  }
+
+  const defaultRow = headers.map((field) => getFormValues()[field] || "");
+  const csv = [headers, defaultRow]
+    .map((line) => line.map((cell) => escapeCsvCell(cell)).join(","))
+    .join("\n");
+
+  triggerDownload(new Blob([csv], { type: "text/csv;charset=utf-8;" }), `${certificateType}-bulk-template.csv`);
+  if (status) status.textContent = "Template downloaded. Fill one recipient per row and upload the file.";
+}
+
+function mapRowToFormValues(baseValues, headers, rowValues) {
+  const mapped = { ...baseValues };
+  headers.forEach((header, index) => {
+    mapped[header] = (rowValues[index] || "").trim();
+  });
+
+  if (mapped.certificateType === "promotion") {
+    return resolvePromotionFields(mapped);
+  }
+
+  return mapped;
+}
+
+function validateCsvHeaders(headers, certificateType) {
+  const requiredHeaders = getCsvHeaders(certificateType);
+  if (!requiredHeaders) {
+    return "Bulk generation is currently available for Promotion and Activities only.";
+  }
+
+  const missingHeaders = requiredHeaders.filter((field) => !headers.includes(field));
+  if (missingHeaders.length) {
+    return `Missing required header(s): ${missingHeaders.join(", ")}`;
+  }
+
+  return "";
+}
+
+async function generatePDFBytes(values) {
+  const formValues = values.certificateType === "promotion" ? resolvePromotionFields(values) : values;
   const isPromotion = formValues.certificateType === "promotion";
   const isAward = formValues.certificateType === "award";
 
   if (containsBlockedTerms(collectCertificateText(formValues))) {
-    downloadNonsenseImage();
-    return;
+    throw new Error("Certificate contains blocked terms.");
   }
 
   const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
@@ -358,7 +500,6 @@ async function generatePDF() {
   const page = pdfDoc.getPages()[0];
 
   const { width, height } = page.getSize();
-
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const serif = await pdfDoc.embedFont(StandardFonts.TimesRoman);
@@ -366,22 +507,11 @@ async function generatePDF() {
   const blue = rgb(0.05, 0.18, 0.52);
   const black = rgb(0.1, 0.1, 0.1);
 
-  function yPercent(percent) {
-    return height * (1 - percent);
-  }
-
-  function centerXForText(text, size, fontUsed) {
-    return (width - fontUsed.widthOfTextAtSize(text, size)) / 2;
-  }
+  const yPercent = (percent) => height * (1 - percent);
+  const centerXForText = (text, size, fontUsed) => (width - fontUsed.widthOfTextAtSize(text, size)) / 2;
 
   function drawCentered(text, percentY, size, fontUsed, color) {
-    page.drawText(text, {
-      x: centerXForText(text, size, fontUsed),
-      y: yPercent(percentY),
-      size,
-      font: fontUsed,
-      color
-    });
+    page.drawText(text, { x: centerXForText(text, size, fontUsed), y: yPercent(percentY), size, font: fontUsed, color });
   }
 
   function splitTextIntoLines(text, maxWidth, size, fontUsed) {
@@ -393,29 +523,20 @@ async function generatePDF() {
       const candidate = currentLine ? `${currentLine} ${word}` : word;
       if (fontUsed.widthOfTextAtSize(candidate, size) <= maxWidth) {
         currentLine = candidate;
-        return;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
       }
-
-      if (currentLine) {
-        lines.push(currentLine);
-      }
-      currentLine = word;
     });
 
-    if (currentLine) {
-      lines.push(currentLine);
-    }
-
+    if (currentLine) lines.push(currentLine);
     return lines.length ? lines : [text];
   }
 
   function drawCenteredWrapped(text, percentY, size, fontUsed, color, maxWidth, lineHeightPercent = 0.035) {
     const lines = splitTextIntoLines(text, maxWidth, size, fontUsed);
     const lineOffset = ((lines.length - 1) * lineHeightPercent) / 2;
-
-    lines.forEach((line, index) => {
-      drawCentered(line, percentY - lineOffset + (index * lineHeightPercent), size, fontUsed, color);
-    });
+    lines.forEach((line, index) => drawCentered(line, percentY - lineOffset + (index * lineHeightPercent), size, fontUsed, color));
   }
 
   function drawCenteredAt(text, centerPercentX, percentY, size, fontUsed, color = black) {
@@ -429,106 +550,161 @@ async function generatePDF() {
     });
   }
 
-  const certificateHeading = isPromotion
-    ? formValues.achievementNumber
-    : isAward
-      ? formValues.awardCategory
-      : formValues.activityName;
+  const certificateHeading = isPromotion ? formValues.achievementNumber : isAward ? formValues.awardCategory : formValues.activityName;
   const certificateTitle = isPromotion ? formValues.achievementTitle : "";
-  const recipientName = isPromotion
-    ? formValues.cadetName
-    : isAward
-      ? formValues.awardRecipient
-      : formValues.activityRecipient;
-  const recipientLine = isPromotion
-    ? formValues.cadetRank
-    : isAward
-      ? formValues.awardSubtitle
-      : formValues.activitySubtitle;
-  const recipientNameY = isPromotion ? 0.447 : 0.418;
-  const recipientLineY = isPromotion ? 0.533 : 0.505;
+  const recipientName = isPromotion ? formValues.cadetName : isAward ? formValues.awardRecipient : formValues.activityRecipient;
+  const recipientLine = isPromotion ? formValues.cadetRank : isAward ? formValues.awardSubtitle : formValues.activitySubtitle;
 
   drawCenteredWrapped(certificateHeading, 0.245, 26, bold, blue, width * 0.84, 0.04);
-  if (certificateTitle) {
-    drawCentered(certificateTitle, 0.342, 20, bold, blue);
-  }
-  drawCentered(recipientName, recipientNameY, 28, serif, black);
-  drawCentered(recipientLine, recipientLineY, 16, bold, blue);
+  if (certificateTitle) drawCentered(certificateTitle, 0.342, 20, bold, blue);
+  drawCentered(recipientName, isPromotion ? 0.447 : 0.418, 28, serif, black);
+  drawCentered(recipientLine, isPromotion ? 0.533 : 0.505, 16, bold, blue);
 
   const rankImagePath = isPromotion ? getRankImage(formValues.achievementNumber) : null;
   if (rankImagePath) {
     const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
-    const img = rankImagePath.toLowerCase().endsWith(".png")
-      ? await pdfDoc.embedPng(imgBytes)
-      : await pdfDoc.embedJpg(imgBytes);
-
+    const img = rankImagePath.toLowerCase().endsWith(".png") ? await pdfDoc.embedPng(imgBytes) : await pdfDoc.embedJpg(imgBytes);
     const imgWidth = 100;
     const imgHeight = (img.height / img.width) * imgWidth;
 
-    const centerX = width * 0.22;
-    const centerY = height * 0.49;
-
     page.drawImage(img, {
-      x: centerX - (imgWidth / 2),
-      y: centerY - (imgHeight / 2),
+      x: (width * 0.22) - (imgWidth / 2),
+      y: (height * 0.49) - (imgHeight / 2),
       width: imgWidth,
       height: imgHeight
     });
   }
 
-  const baseY = 0.66;
-  const lineSpacing = 0.035;
-
   const presentationLine = isPromotion
     ? `Proudly Presented on this ${formatDate(formValues.promotionDate)}`
     : `Recognized on this ${formatDate(formValues.promotionDate)}`;
-  drawCentered(presentationLine, baseY, 12, bold, black);
-  drawCentered(formValues.unitLine, baseY + lineSpacing, 12, bold, black);
 
-  const leftSignatureCenter = 0.285;
-  const rightSignatureCenter = 0.737;
+  drawCentered(presentationLine, 0.66, 12, bold, black);
+  drawCentered(formValues.unitLine, 0.695, 12, bold, black);
 
-  drawCenteredAt(formValues.leftSignerName, leftSignatureCenter, 0.874, 12, font);
-  drawCenteredAt(formValues.leftSignerTitle, leftSignatureCenter, 0.91, 10, font);
-  drawCenteredAt(formValues.rightSignerName, rightSignatureCenter, 0.874, 12, font);
-  drawCenteredAt(formValues.rightSignerTitle, rightSignatureCenter, 0.91, 10, font);
+  drawCenteredAt(formValues.leftSignerName, 0.285, 0.874, 12, font);
+  drawCenteredAt(formValues.leftSignerTitle, 0.285, 0.91, 10, font);
+  drawCenteredAt(formValues.rightSignerName, 0.737, 0.874, 12, font);
+  drawCenteredAt(formValues.rightSignerTitle, 0.737, 0.91, 10, font);
 
-  const finalBytes = await pdfDoc.save();
-
-  const blob = new Blob([finalBytes], { type: "application/pdf" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  const fileNameBase = (isPromotion
-    ? formValues.cadetName
-    : isAward
-      ? formValues.awardRecipient
-      : formValues.activityRecipient)
-    .replace(/\s+/g, "-")
-    .toLowerCase();
-  a.download = `${fileNameBase}-certificate.pdf`;
-  a.click();
-
-  URL.revokeObjectURL(url);
+  return pdfDoc.save();
 }
 
-/* ------------------ EVENTS ------------------ */
+async function generatePDF() {
+  const formValues = getFormValues();
+
+  try {
+    const finalBytes = await generatePDFBytes(formValues);
+    const recipient = formValues.certificateType === "promotion"
+      ? formValues.cadetName
+      : formValues.certificateType === "award"
+        ? formValues.awardRecipient
+        : formValues.activityRecipient;
+
+    triggerDownload(new Blob([finalBytes], { type: "application/pdf" }), `${sanitizeFileName(recipient)}-certificate.pdf`);
+  } catch (error) {
+    if (String(error.message || "").includes("blocked terms")) {
+      downloadNonsenseImage();
+      return;
+    }
+
+    const status = byId("bulkStatus");
+    if (status) status.textContent = "Unable to generate certificate. Please verify your inputs and try again.";
+    console.error(error);
+  }
+}
+
+async function handleBulkUpload(file) {
+  const status = byId("bulkStatus");
+  const baseValues = getFormValues();
+
+  if (!file) return;
+  if (!(window.JSZip)) {
+    if (status) status.textContent = "Bulk generation requires JSZip to be available.";
+    return;
+  }
+
+  const certificateType = baseValues.certificateType;
+  if (!getCsvHeaders(certificateType)) {
+    if (status) status.textContent = "Bulk generation is currently available for Promotion and Activities only.";
+    return;
+  }
+
+  const text = await file.text();
+  const rows = parseCSV(text);
+
+  if (!rows.length) {
+    if (status) status.textContent = "The uploaded CSV is empty.";
+    return;
+  }
+
+  const headers = rows[0];
+  const headerError = validateCsvHeaders(headers, certificateType);
+  if (headerError) {
+    if (status) status.textContent = headerError;
+    return;
+  }
+
+  const bodyRows = rows.slice(1).filter((row) => row.some((cell) => cell && cell.trim()));
+  if (!bodyRows.length) {
+    if (status) status.textContent = "No data rows found in CSV.";
+    return;
+  }
+
+  const zip = new JSZip();
+  const skippedRows = [];
+
+  for (let i = 0; i < bodyRows.length; i += 1) {
+    const row = bodyRows[i];
+    const rowValues = mapRowToFormValues(baseValues, headers, row);
+
+    try {
+      const pdfBytes = await generatePDFBytes(rowValues);
+      const recipient = rowValues.certificateType === "promotion" ? rowValues.cadetName : rowValues.activityRecipient;
+      zip.file(`${String(i + 1).padStart(3, "0")}-${sanitizeFileName(recipient)}-certificate.pdf`, pdfBytes);
+    } catch (error) {
+      skippedRows.push(i + 2);
+    }
+  }
+
+  const zipBlob = await zip.generateAsync({ type: "blob" });
+  triggerDownload(zipBlob, `${certificateType}-certificates.zip`);
+
+  if (status) {
+    status.textContent = skippedRows.length
+      ? `ZIP downloaded. ${bodyRows.length - skippedRows.length} certificates created. Skipped CSV row(s): ${skippedRows.join(", ")}.`
+      : `ZIP downloaded with ${bodyRows.length} certificates.`;
+  }
+}
 
 function bindFormEvents() {
   document.querySelectorAll("input, select").forEach((el) => {
     const handler = () => {
-      if (el.id === "achievementNumber") {
-        syncAchievementFields();
-      }
-      if (el.id === "certificateType") {
-        syncCertificateTypeFields();
-      }
+      if (el.id === "achievementNumber") syncAchievementFields();
+      if (el.id === "certificateType") syncCertificateTypeFields();
       updatePreview();
     };
 
     el.addEventListener("input", handler);
     el.addEventListener("change", handler);
+  });
+}
+
+function bindBulkEvents() {
+  const downloadTemplateBtn = byId("downloadTemplateBtn");
+  const uploadCsvBtn = byId("uploadCsvBtn");
+  const bulkCsvInput = byId("bulkCsvInput");
+
+  downloadTemplateBtn?.addEventListener("click", downloadCsvTemplate);
+
+  uploadCsvBtn?.addEventListener("click", () => {
+    bulkCsvInput?.click();
+  });
+
+  bulkCsvInput?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    await handleBulkUpload(file);
+    event.target.value = "";
   });
 }
 
@@ -544,6 +720,7 @@ function initialize() {
   syncCertificateTypeFields();
   initializePromotionDate();
   bindFormEvents();
+  bindBulkEvents();
   byId("downloadBtn")?.addEventListener("click", generatePDF);
   updatePreview();
 }

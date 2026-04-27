@@ -7,6 +7,7 @@
   <link rel="shortcut icon" href="favicon.png" />
   <link rel="stylesheet" href="styles.css" />
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 
 <body>
@@ -215,6 +216,20 @@
           <div class="button-row">
             <button id="downloadBtn" type="button">Download PDF</button>
           </div>
+          <div class="bulk-tools" aria-label="Bulk certificate generation">
+            <h3>Bulk CSV Generation</h3>
+            <p class="field-help">
+              Download a CSV template for the selected certificate type, fill in one row per recipient,
+              then upload it to generate a ZIP of certificates.
+            </p>
+            <div class="button-row button-row--stacked">
+              <button id="downloadTemplateBtn" type="button" class="button-secondary">Download CSV Template</button>
+              <button id="uploadCsvBtn" type="button" class="button-secondary">Upload CSV and Download ZIP</button>
+            </div>
+            <input id="bulkCsvInput" type="file" accept="text/csv,.csv" class="hidden" />
+            <p id="bulkStatus" class="field-help" role="status" aria-live="polite"></p>
+          </div>
+
         </section>
 
         <!-- FOOTER (correct location) -->

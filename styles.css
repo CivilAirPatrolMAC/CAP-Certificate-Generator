@@ -188,6 +188,25 @@ button:hover {
   background: var(--brand-dark);
 }
 
+.button-secondary {
+  background: #1f3a5f;
+}
+
+.bulk-tools {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.bulk-tools h3 {
+  margin: 0;
+}
+
+.button-row--stacked {
+  display: grid;
+  gap: 0.6rem;
+}
+
 /* ------------------ PREVIEW ------------------ */
 
 .preview-frame {
