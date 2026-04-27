@@ -308,7 +308,7 @@ button:hover {
 }
 
 .right-signer-name {
-  left: 73.2%;
+  left: 73.7%;
   top: 87.3%;
   transform: translateX(-50%);
   font-size: clamp(11px, 1.5vw, 18px);
@@ -316,7 +316,7 @@ button:hover {
 }
 
 .right-signer-title {
-  left: 73.2%;
+  left: 73.7%;
   top: 91%;
   transform: translateX(-50%);
   font-size: clamp(10px, 1.2vw, 15px);
