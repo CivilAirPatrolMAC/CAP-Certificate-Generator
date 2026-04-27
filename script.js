@@ -137,7 +137,7 @@ function setPreviewText(formValues) {
       }
     : {
         achievementNumber: formValues.awardCategory,
-        achievementTitle: "OF THE YEAR AWARD",
+        achievementTitle: "",
         cadetName: formValues.awardRecipient,
         cadetRank: formValues.awardSubtitle
       };
@@ -177,6 +177,8 @@ function setPreviewRankImage(achievementNumber) {
 
 function updatePreview() {
   const formValues = getFormValues();
+  const certificatePreview = document.querySelector(".certificate-preview");
+  certificatePreview?.classList.toggle("award-mode", formValues.certificateType === "award");
   setPreviewText(formValues);
   const selectedAchievement = formValues.certificateType === "promotion"
     ? formValues.achievementNumber
@@ -247,14 +249,18 @@ async function generatePDF() {
   }
 
   const certificateHeading = isPromotion ? formValues.achievementNumber : formValues.awardCategory;
-  const certificateTitle = isPromotion ? formValues.achievementTitle : "OF THE YEAR AWARD";
+  const certificateTitle = isPromotion ? formValues.achievementTitle : "";
   const recipientName = isPromotion ? formValues.cadetName : formValues.awardRecipient;
   const recipientLine = isPromotion ? formValues.cadetRank : formValues.awardSubtitle;
+  const recipientNameY = isPromotion ? 0.447 : 0.418;
+  const recipientLineY = isPromotion ? 0.533 : 0.505;
 
   drawCentered(certificateHeading, 0.245, 26, bold, blue);
-  drawCentered(certificateTitle, 0.342, 20, bold, blue);
-  drawCentered(recipientName, 0.447, 28, serif, black);
-  drawCentered(recipientLine, 0.533, 16, bold, blue);
+  if (certificateTitle) {
+    drawCentered(certificateTitle, 0.342, 20, bold, blue);
+  }
+  drawCentered(recipientName, recipientNameY, 28, serif, black);
+  drawCentered(recipientLine, recipientLineY, 16, bold, blue);
 
   const rankImagePath = isPromotion ? getRankImage(formValues.achievementNumber) : null;
   if (rankImagePath) {

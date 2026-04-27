@@ -254,6 +254,14 @@ button:hover {
   letter-spacing: 0.02em;
 }
 
+.certificate-preview.award-mode .cadet-name {
+  top: 41.8%;
+}
+
+.certificate-preview.award-mode .cadet-rank {
+  top: 50.5%;
+}
+
 .preview-rank-image {
   position: absolute;
   top: 50%;
