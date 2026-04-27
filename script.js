@@ -274,6 +274,40 @@ async function generatePDF() {
     });
   }
 
+  function splitTextIntoLines(text, maxWidth, size, fontUsed) {
+    const words = text.trim().split(/\s+/);
+    const lines = [];
+    let currentLine = "";
+
+    words.forEach((word) => {
+      const candidate = currentLine ? `${currentLine} ${word}` : word;
+      if (fontUsed.widthOfTextAtSize(candidate, size) <= maxWidth) {
+        currentLine = candidate;
+        return;
+      }
+
+      if (currentLine) {
+        lines.push(currentLine);
+      }
+      currentLine = word;
+    });
+
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+
+    return lines.length ? lines : [text];
+  }
+
+  function drawCenteredWrapped(text, percentY, size, fontUsed, color, maxWidth, lineHeightPercent = 0.035) {
+    const lines = splitTextIntoLines(text, maxWidth, size, fontUsed);
+    const lineOffset = ((lines.length - 1) * lineHeightPercent) / 2;
+
+    lines.forEach((line, index) => {
+      drawCentered(line, percentY - lineOffset + (index * lineHeightPercent), size, fontUsed, color);
+    });
+  }
+
   function drawCenteredAt(text, centerPercentX, percentY, size, fontUsed, color = black) {
     const textWidth = fontUsed.widthOfTextAtSize(text, size);
     page.drawText(text, {
@@ -292,7 +326,7 @@ async function generatePDF() {
   const recipientNameY = isPromotion ? 0.447 : 0.418;
   const recipientLineY = isPromotion ? 0.533 : 0.505;
 
-  drawCentered(certificateHeading, 0.245, 26, bold, blue);
+  drawCenteredWrapped(certificateHeading, 0.245, 26, bold, blue, width * 0.84, 0.04);
   if (certificateTitle) {
     drawCentered(certificateTitle, 0.342, 20, bold, blue);
   }
