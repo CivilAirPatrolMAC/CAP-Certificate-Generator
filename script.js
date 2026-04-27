@@ -271,7 +271,6 @@ function updatePreview() {
   certificatePreview?.classList.toggle("award-mode", formValues.certificateType !== "promotion");
   setPreviewText(formValues);
   setPreviewRankImage(formValues.certificateType === "promotion" ? formValues.achievementNumber : "");
-  runPrintSafetyCheck(formValues.certificateType);
 }
 
 function syncCertificateTypeFields() {
@@ -749,51 +748,6 @@ async function generateExport() {
     if (status) status.textContent = "Unable to generate certificate. Please verify your inputs and try again.";
     console.error(error);
   }
-}
-
-function runPrintSafetyCheck(certificateType) {
-  const container = document.querySelector(".certificate-preview");
-  const statusNode = byId("printSafetyStatus");
-  if (!container || !statusNode) return;
-
-  const containerRect = container.getBoundingClientRect();
-  const safeLeft = containerRect.left + (containerRect.width * 0.04);
-  const safeRight = containerRect.right - (containerRect.width * 0.04);
-  const safeTop = containerRect.top + (containerRect.height * 0.05);
-  const safeBottom = containerRect.bottom - (containerRect.height * 0.05);
-
-  const nodes = Array.from(container.querySelectorAll(".preview-text, .preview-rank-image"));
-  const activeNodes = nodes.filter((node) => {
-    if (node.classList.contains("preview-rank-image") && certificateType !== "promotion") {
-      return false;
-    }
-    if (node.id === "previewAchievementTitle" && certificateType !== "promotion") {
-      return false;
-    }
-    return window.getComputedStyle(node).display !== "none";
-  });
-
-  const issues = [];
-  activeNodes.forEach((node) => {
-    node.classList.remove("print-risk");
-    const rect = node.getBoundingClientRect();
-    const overflow = rect.left < containerRect.left || rect.right > containerRect.right || rect.top < containerRect.top || rect.bottom > containerRect.bottom;
-    const unsafe = rect.left < safeLeft || rect.right > safeRight || rect.top < safeTop || rect.bottom > safeBottom;
-    if (overflow || unsafe) {
-      node.classList.add("print-risk");
-      const label = node.id.replace("preview", "").replace(/([A-Z])/g, " $1").trim();
-      issues.push(`${label}${overflow ? " overflows the template area." : " is close to the trim edge."}`);
-    }
-  });
-
-  if (issues.length) {
-    statusNode.classList.add("print-safety-status--warning");
-    statusNode.innerHTML = `<strong>Print-safety warning:</strong><ul>${issues.map((issue) => `<li>${issue}</li>`).join("")}</ul>`;
-    return;
-  }
-
-  statusNode.classList.remove("print-safety-status--warning");
-  statusNode.innerHTML = "<strong>Print-safe:</strong> All visible text is inside the safe margin guide.";
 }
 
 async function handleBulkUpload(file) {
