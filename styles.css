@@ -136,6 +136,14 @@ label {
   margin-bottom: 0.4rem;
 }
 
+.form-section {
+  margin-top: 0.2rem;
+}
+
+.hidden {
+  display: none;
+}
+
 .field-help {
   margin: 0 0 0.4rem;
   font-size: 0.85rem;
@@ -244,6 +252,14 @@ button:hover {
   font-weight: 800;
   color: #163b8f;
   letter-spacing: 0.02em;
+}
+
+.certificate-preview.award-mode .cadet-name {
+  top: 41.8%;
+}
+
+.certificate-preview.award-mode .cadet-rank {
+  top: 50.5%;
 }
 
 .preview-rank-image {

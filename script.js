@@ -1,10 +1,14 @@
 const { PDFDocument, StandardFonts, rgb } = PDFLib;
 
 const DEFAULTS = Object.freeze({
+  certificateType: "promotion",
   achievementNumber: "ACHIEVEMENT 7",
   achievementTitle: "Dr. Robert Goddard",
   cadetName: "Hanniah Beacham",
   cadetRank: "Cadet Senior Master Sergeant",
+  awardCategory: "Cadet of the Year",
+  awardRecipient: "Hanniah Beacham",
+  awardSubtitle: "For exceptional leadership and service",
   unitLine: "Fort Worth Composite Squadron, Fort Worth, Texas",
   leftSignerName: "Roman Vitanza",
   leftSignerTitle: "Squadron Commander",
@@ -42,6 +46,21 @@ const PREVIEW_MAP = Object.freeze({
   rightSignerTitle: "previewRightSignerTitle"
 });
 
+const GUIDANCE_ITEMS = Object.freeze({
+  promotion: [
+    "Verify the cadet’s full name, achievement, and promotion date.",
+    "Confirm the unit line appears exactly as it should on the certificate.",
+    "Review rank insignia, signature blocks, and spacing before downloading.",
+    "Use the live preview to confirm the final certificate layout.",
+    "Major milestone awards (Wright Brothers, Mitchell, Eaker, ect) will be mailed to the squadron commander and this tool should not be used to replace those"
+  ],
+  award: [
+    "Verify the member's full name, achievement, and award date",
+    "Confirm the unit line appears exactly as it should on the certificate.",
+    "Use the live preview to confirm the final certificate layout."
+  ]
+});
+
 /* ------------------ HELPERS ------------------ */
 
 function byId(id) {
@@ -55,10 +74,14 @@ function getValue(id, fallback = "") {
 
 function getFormValues() {
   return {
+    certificateType: getValue("certificateType", DEFAULTS.certificateType),
     achievementNumber: getValue("achievementNumber", DEFAULTS.achievementNumber),
     achievementTitle: getValue("achievementTitle", DEFAULTS.achievementTitle),
     cadetName: getValue("cadetName", DEFAULTS.cadetName),
     cadetRank: getValue("cadetRank", DEFAULTS.cadetRank),
+    awardCategory: getValue("awardCategory", DEFAULTS.awardCategory),
+    awardRecipient: getValue("awardRecipient", DEFAULTS.awardRecipient),
+    awardSubtitle: getValue("awardSubtitle", DEFAULTS.awardSubtitle),
     promotionDate: getValue("promotionDate"),
     unitLine: getValue("unitLine", DEFAULTS.unitLine),
     leftSignerName: getValue("leftSignerName", DEFAULTS.leftSignerName),
@@ -119,16 +142,34 @@ function syncAchievementFields() {
 }
 
 function setPreviewText(formValues) {
+  const isPromotion = formValues.certificateType === "promotion";
+  const previewValues = isPromotion
+    ? {
+        achievementNumber: formValues.achievementNumber,
+        achievementTitle: formValues.achievementTitle,
+        cadetName: formValues.cadetName,
+        cadetRank: formValues.cadetRank
+      }
+    : {
+        achievementNumber: formValues.awardCategory,
+        achievementTitle: "",
+        cadetName: formValues.awardRecipient,
+        cadetRank: formValues.awardSubtitle
+      };
+
   Object.entries(PREVIEW_MAP).forEach(([formKey, previewId]) => {
     const previewNode = byId(previewId);
     if (previewNode) {
-      previewNode.textContent = formValues[formKey];
+      const hasOverride = Object.prototype.hasOwnProperty.call(previewValues, formKey);
+      previewNode.textContent = hasOverride ? previewValues[formKey] : formValues[formKey];
     }
   });
 
   const presentedLine = byId("previewPresentedLine");
   if (presentedLine) {
-    presentedLine.textContent = `Proudly Presented on this ${formatDate(formValues.promotionDate)}`;
+    presentedLine.textContent = isPromotion
+      ? `Proudly Presented on this ${formatDate(formValues.promotionDate)}`
+      : `Recognized on this ${formatDate(formValues.promotionDate)}`;
   }
 }
 
@@ -152,14 +193,44 @@ function setPreviewRankImage(achievementNumber) {
 
 function updatePreview() {
   const formValues = getFormValues();
+  const certificatePreview = document.querySelector(".certificate-preview");
+  certificatePreview?.classList.toggle("award-mode", formValues.certificateType === "award");
   setPreviewText(formValues);
-  setPreviewRankImage(formValues.achievementNumber);
+  const selectedAchievement = formValues.certificateType === "promotion"
+    ? formValues.achievementNumber
+    : "";
+  setPreviewRankImage(selectedAchievement);
+}
+
+function syncCertificateTypeFields() {
+  const certificateType = getValue("certificateType", DEFAULTS.certificateType);
+  const promotionFields = byId("promotionFields");
+  const awardFields = byId("awardFields");
+
+  if (promotionFields) {
+    promotionFields.classList.toggle("hidden", certificateType !== "promotion");
+  }
+
+  if (awardFields) {
+    awardFields.classList.toggle("hidden", certificateType !== "award");
+  }
+
+  syncGuidanceChecklist(certificateType);
+}
+
+function syncGuidanceChecklist(certificateType) {
+  const checklist = byId("guidanceChecklist");
+  if (!checklist) return;
+
+  const guidanceItems = GUIDANCE_ITEMS[certificateType] || GUIDANCE_ITEMS.promotion;
+  checklist.innerHTML = guidanceItems.map((item) => `<li>${item}</li>`).join("");
 }
 
 /* ------------------ PDF ------------------ */
 
 async function generatePDF() {
   const formValues = getFormValues();
+  const isPromotion = formValues.certificateType === "promotion";
 
   const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
   const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -203,12 +274,21 @@ async function generatePDF() {
     });
   }
 
-  drawCentered(formValues.achievementNumber, 0.245, 26, bold, blue);
-  drawCentered(formValues.achievementTitle, 0.342, 20, bold, blue);
-  drawCentered(formValues.cadetName, 0.447, 28, serif, black);
-  drawCentered(formValues.cadetRank, 0.533, 16, bold, blue);
+  const certificateHeading = isPromotion ? formValues.achievementNumber : formValues.awardCategory;
+  const certificateTitle = isPromotion ? formValues.achievementTitle : "";
+  const recipientName = isPromotion ? formValues.cadetName : formValues.awardRecipient;
+  const recipientLine = isPromotion ? formValues.cadetRank : formValues.awardSubtitle;
+  const recipientNameY = isPromotion ? 0.447 : 0.418;
+  const recipientLineY = isPromotion ? 0.533 : 0.505;
 
-  const rankImagePath = getRankImage(formValues.achievementNumber);
+  drawCentered(certificateHeading, 0.245, 26, bold, blue);
+  if (certificateTitle) {
+    drawCentered(certificateTitle, 0.342, 20, bold, blue);
+  }
+  drawCentered(recipientName, recipientNameY, 28, serif, black);
+  drawCentered(recipientLine, recipientLineY, 16, bold, blue);
+
+  const rankImagePath = isPromotion ? getRankImage(formValues.achievementNumber) : null;
   if (rankImagePath) {
     const imgBytes = await fetch(rankImagePath).then((res) => res.arrayBuffer());
     const img = rankImagePath.toLowerCase().endsWith(".png")
@@ -232,7 +312,10 @@ async function generatePDF() {
   const baseY = 0.66;
   const lineSpacing = 0.035;
 
-  drawCentered(`Proudly Presented on this ${formatDate(formValues.promotionDate)}`, baseY, 12, bold, black);
+  const presentationLine = isPromotion
+    ? `Proudly Presented on this ${formatDate(formValues.promotionDate)}`
+    : `Recognized on this ${formatDate(formValues.promotionDate)}`;
+  drawCentered(presentationLine, baseY, 12, bold, black);
   drawCentered(formValues.unitLine, baseY + lineSpacing, 12, bold, black);
 
   const leftSignatureCenter = 0.285;
@@ -250,7 +333,10 @@ async function generatePDF() {
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${formValues.cadetName.replace(/\s+/g, "-").toLowerCase()}-certificate.pdf`;
+  const fileNameBase = (isPromotion ? formValues.cadetName : formValues.awardRecipient)
+    .replace(/\s+/g, "-")
+    .toLowerCase();
+  a.download = `${fileNameBase}-certificate.pdf`;
   a.click();
 
   URL.revokeObjectURL(url);
@@ -263,6 +349,9 @@ function bindFormEvents() {
     const handler = () => {
       if (el.id === "achievementNumber") {
         syncAchievementFields();
+      }
+      if (el.id === "certificateType") {
+        syncCertificateTypeFields();
       }
       updatePreview();
     };
@@ -281,6 +370,7 @@ function initializePromotionDate() {
 
 function initialize() {
   syncAchievementFields();
+  syncCertificateTypeFields();
   initializePromotionDate();
   bindFormEvents();
   byId("downloadBtn")?.addEventListener("click", generatePDF);
