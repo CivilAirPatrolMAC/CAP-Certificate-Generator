@@ -145,7 +145,8 @@ function setPreviewText(formValues) {
   Object.entries(PREVIEW_MAP).forEach(([formKey, previewId]) => {
     const previewNode = byId(previewId);
     if (previewNode) {
-      previewNode.textContent = previewValues[formKey] || formValues[formKey];
+      const hasOverride = Object.prototype.hasOwnProperty.call(previewValues, formKey);
+      previewNode.textContent = hasOverride ? previewValues[formKey] : formValues[formKey];
     }
   });
 
