@@ -204,15 +204,26 @@ function updatePreview() {
 
 function syncCertificateTypeFields() {
   const certificateType = getValue("certificateType", DEFAULTS.certificateType);
+  const isPromotion = certificateType === "promotion";
   const promotionFields = byId("promotionFields");
   const awardFields = byId("awardFields");
+  const promotionDateLabel = byId("promotionDateLabel");
+  const awardSubtitle = byId("awardSubtitle");
 
   if (promotionFields) {
-    promotionFields.classList.toggle("hidden", certificateType !== "promotion");
+    promotionFields.classList.toggle("hidden", !isPromotion);
   }
 
   if (awardFields) {
-    awardFields.classList.toggle("hidden", certificateType !== "award");
+    awardFields.classList.toggle("hidden", isPromotion);
+  }
+
+  if (promotionDateLabel) {
+    promotionDateLabel.textContent = isPromotion ? "Date earned in eServices" : "Date Earned";
+  }
+
+  if (awardSubtitle) {
+    awardSubtitle.disabled = !isPromotion;
   }
 
   syncGuidanceChecklist(certificateType);
