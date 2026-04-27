@@ -1,4 +1,4 @@
-# CAP Achievement Certificate Generator
+# CAP Certificate Generator
 
 A lightweight web app for creating **Civil Air Patrol cadet achievement certificates**. The tool provides a guided form, a live visual preview, and one-click PDF export based on the project certificate template.
 
