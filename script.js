@@ -334,20 +334,11 @@ function containsBlockedTerms(text) {
   return BLOCKED_TERMS_REGEX.test(text);
 }
 
-async function downloadNonsenseImage() {
-  const response = await fetch("nonsense.png");
-
-  if (!response.ok) {
-    throw new Error("Unable to download nonsense.png");
-  }
-
-  const blob = await response.blob();
-  const url = URL.createObjectURL(blob);
+function downloadNonsenseImage() {
   const a = document.createElement("a");
-  a.href = url;
+  a.href = "nonsense.png";
   a.download = "nonsense.png";
   a.click();
-  URL.revokeObjectURL(url);
 }
 
 /* ------------------ PDF ------------------ */
@@ -358,7 +349,7 @@ async function generatePDF() {
   const isAward = formValues.certificateType === "award";
 
   if (containsBlockedTerms(collectCertificateText(formValues))) {
-    await downloadNonsenseImage();
+    downloadNonsenseImage();
     return;
   }
 
