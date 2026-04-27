@@ -293,7 +293,7 @@ button:hover {
 
 .left-signer-name {
   left: 28.5%;
-  top: 87.8%;
+  top: 87.3%;
   transform: translateX(-50%);
   font-size: clamp(11px, 1.5vw, 18px);
   color: #111;
@@ -309,7 +309,7 @@ button:hover {
 
 .right-signer-name {
   left: 73.2%;
-  top: 87.8%;
+  top: 87.3%;
   transform: translateX(-50%);
   font-size: clamp(11px, 1.5vw, 18px);
   color: #111;
