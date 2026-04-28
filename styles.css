@@ -141,7 +141,7 @@ label {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .field-help {
