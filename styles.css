@@ -238,10 +238,6 @@ button:hover {
   place-items: center;
 }
 
-.modal.hidden {
-  display: none;
-}
-
 .modal__backdrop {
   position: absolute;
   inset: 0;
@@ -277,17 +273,6 @@ button:hover {
   aspect-ratio: 11 / 8.5;
   margin: 0 auto;
   background: white;
-}
-
-.certificate-preview::after {
-  content: "";
-  position: absolute;
-  top: 5%;
-  right: 4%;
-  bottom: 5%;
-  left: 4%;
-  border: 2px dashed rgba(15, 76, 129, 0.35);
-  pointer-events: none;
 }
 
 .certificate-bg {

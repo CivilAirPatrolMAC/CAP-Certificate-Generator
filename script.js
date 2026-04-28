@@ -720,6 +720,58 @@ async function generatePrintQualityPDFBytes(values) {
   return pdfDoc.save({ useObjectStreams: false, addDefaultPage: false });
 }
 
+async function generatePrintTestPDFBytes() {
+  const pdfBytes = await fetch("template.pdf").then((res) => res.arrayBuffer());
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const page = pdfDoc.getPages()[0];
+  const { width, height } = page.getSize();
+
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const red = rgb(0.75, 0.05, 0.05);
+  const blue = rgb(0.05, 0.18, 0.52);
+  const gray = rgb(0.25, 0.25, 0.25);
+
+  const margin = 36;
+  page.drawRectangle({
+    x: margin,
+    y: margin,
+    width: width - (margin * 2),
+    height: height - (margin * 2),
+    borderColor: red,
+    borderWidth: 1.2
+  });
+
+  page.drawLine({ start: { x: width / 2, y: margin }, end: { x: width / 2, y: height - margin }, color: blue, thickness: 0.8 });
+  page.drawLine({ start: { x: margin, y: height / 2 }, end: { x: width - margin, y: height / 2 }, color: blue, thickness: 0.8 });
+
+  page.drawText("CERTIFICATE PRINTER ALIGNMENT TEST PAGE", {
+    x: 72,
+    y: height - 52,
+    size: 14,
+    font: bold,
+    color: red
+  });
+
+  page.drawText("If this border or crosshair is clipped, adjust printer margins/scaling to 100% actual size.", {
+    x: 72,
+    y: height - 72,
+    size: 10,
+    font,
+    color: gray
+  });
+
+  page.drawText(`Generated: ${new Date().toLocaleString("en-US")}`, {
+    x: 72,
+    y: 44,
+    size: 9,
+    font,
+    color: gray
+  });
+
+  return pdfDoc.save({ useObjectStreams: false });
+}
+
 function getRecipientName(formValues) {
   return formValues.certificateType === "promotion"
     ? formValues.cadetName
@@ -771,6 +823,17 @@ async function generateExport() {
 
     const status = byId("bulkStatus");
     if (status) status.textContent = "Unable to generate certificate. Please verify your inputs and try again.";
+    console.error(error);
+  }
+}
+
+async function generatePrintTestPage() {
+  try {
+    const testPdfBytes = await generatePrintTestPDFBytes();
+    triggerDownload(new Blob([testPdfBytes], { type: "application/pdf" }), "certificate-print-test-page.pdf");
+  } catch (error) {
+    const status = byId("bulkStatus");
+    if (status) status.textContent = "Unable to generate print test page right now.";
     console.error(error);
   }
 }
@@ -883,6 +946,7 @@ function initialize() {
   bindFormEvents();
   bindBulkEvents();
   byId("downloadBtn")?.addEventListener("click", generateExport);
+  byId("printTestBtn")?.addEventListener("click", generatePrintTestPage);
   byId("resetBtn")?.addEventListener("click", applyDefaultValues);
   byId("openDisclaimerBtn")?.addEventListener("click", () => byId("disclaimerModal")?.classList.remove("hidden"));
   byId("closeDisclaimerBtn")?.addEventListener("click", () => byId("disclaimerModal")?.classList.add("hidden"));
