@@ -348,7 +348,7 @@ button:hover {
   top: 50%;
   left: 79%;
   transform: translate(-50%, -50%);
-  height: 90px;
+  height: 74px;
   width: auto;
   object-fit: contain;
   display: none;
@@ -478,7 +478,7 @@ button:hover {
   }
 
   .preview-ribbon-image {
-    height: 70px;
+    height: 58px;
     left: 79%;
     top: 50%;
   }
@@ -551,7 +551,7 @@ button:hover {
   }
 
   .preview-ribbon-image {
-    height: 60px;
+    height: 50px;
   }
 }
 
