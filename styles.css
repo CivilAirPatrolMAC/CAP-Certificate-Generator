@@ -346,7 +346,7 @@ button:hover {
 .preview-ribbon-image {
   position: absolute;
   top: 50%;
-  left: 30.5%;
+  left: 79%;
   transform: translate(-50%, -50%);
   height: 90px;
   width: auto;
@@ -479,7 +479,7 @@ button:hover {
 
   .preview-ribbon-image {
     height: 70px;
-    left: 30.5%;
+    left: 79%;
     top: 50%;
   }
 

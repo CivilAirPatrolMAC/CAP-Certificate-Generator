@@ -639,11 +639,11 @@ async function generatePDFBytes(values) {
   if (ribbonImagePath) {
     const imgBytes = await fetch(ribbonImagePath).then((res) => res.arrayBuffer());
     const img = ribbonImagePath.toLowerCase().endsWith(".png") ? await pdfDoc.embedPng(imgBytes) : await pdfDoc.embedJpg(imgBytes);
-    const imgWidth = 95;
+    const imgWidth = 100;
     const imgHeight = (img.height / img.width) * imgWidth;
 
     page.drawImage(img, {
-      x: (width * 0.305) - (imgWidth / 2),
+      x: (width * 0.79) - (imgWidth / 2),
       y: (height * 0.49) - (imgHeight / 2),
       width: imgWidth,
       height: imgHeight
@@ -758,11 +758,11 @@ async function generatePrintQualityPDFBytes(values) {
   if (ribbonImagePath) {
     const imgBytes = await fetch(ribbonImagePath).then((res) => res.arrayBuffer());
     const img = ribbonImagePath.toLowerCase().endsWith(".png") ? await pdfDoc.embedPng(imgBytes) : await pdfDoc.embedJpg(imgBytes);
-    const imgWidth = 95;
+    const imgWidth = 100;
     const imgHeight = (img.height / img.width) * imgWidth;
 
     page.drawImage(img, {
-      x: (width * 0.305) - (imgWidth / 2),
+      x: (width * 0.79) - (imgWidth / 2),
       y: (height * 0.49) - (imgHeight / 2),
       width: imgWidth,
       height: imgHeight
