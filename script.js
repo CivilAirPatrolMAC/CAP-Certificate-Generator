@@ -940,6 +940,10 @@ function initializePromotionDate() {
 }
 
 function initialize() {
+  const disclaimerModal = byId("disclaimerModal");
+  const openDisclaimer = () => disclaimerModal?.classList.remove("hidden");
+  const closeDisclaimer = () => disclaimerModal?.classList.add("hidden");
+
   syncAchievementFields();
   syncCertificateTypeFields();
   initializePromotionDate();
@@ -948,9 +952,22 @@ function initialize() {
   byId("downloadBtn")?.addEventListener("click", generateExport);
   byId("printTestBtn")?.addEventListener("click", generatePrintTestPage);
   byId("resetBtn")?.addEventListener("click", applyDefaultValues);
-  byId("openDisclaimerBtn")?.addEventListener("click", () => byId("disclaimerModal")?.classList.remove("hidden"));
-  byId("closeDisclaimerBtn")?.addEventListener("click", () => byId("disclaimerModal")?.classList.add("hidden"));
-  byId("closeDisclaimerBackdrop")?.addEventListener("click", () => byId("disclaimerModal")?.classList.add("hidden"));
+  byId("openDisclaimerBtn")?.addEventListener("click", openDisclaimer);
+  byId("closeDisclaimerBtn")?.addEventListener("click", closeDisclaimer);
+  byId("closeDisclaimerBackdrop")?.addEventListener("click", closeDisclaimer);
+  disclaimerModal?.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    if (target.id === "closeDisclaimerBtn" || target.id === "closeDisclaimerBackdrop") {
+      closeDisclaimer();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && disclaimerModal && !disclaimerModal.classList.contains("hidden")) {
+      closeDisclaimer();
+    }
+  });
   updatePreview();
 }
 
