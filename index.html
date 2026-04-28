@@ -77,6 +77,7 @@
               <li>Use the live preview to confirm the final certificate layout.</li>
               <li>Major milestone awards (Wright Brothers, Mitchell, Eaker, ect) will be mailed to the squadron commander and this tool should not be used to replace those</li>
             </ul>
+            <button id="openDisclaimerBtn" type="button" class="button-link">View CAP usage disclaimer</button>
           </div>
         </section>
 
@@ -85,6 +86,7 @@
           <h2>Details</h2>
 
           <label for="certificateType">Certificate Type</label>
+          <p class="field-example">Example: Cadet Promotion</p>
           <select id="certificateType">
             <option value="promotion" selected>Cadet Promotion</option>
             <option value="award">Of the Year Awards</option>
@@ -93,6 +95,7 @@
 
           <div id="promotionFields" class="form-section">
             <label for="achievementNumber">Achievement</label>
+            <p class="field-example">Example: ACHIEVEMENT 7</p>
             <select id="achievementNumber">
               <option value='ACHIEVEMENT 2' data-title='General "Hap" Arnold' data-rank="Cadet Airman First Class">
                 Achievement 2 - General "Hap" Arnold
@@ -145,6 +148,7 @@
             <input id="achievementTitle" value="Dr. Robert Goddard" disabled />
 
             <label for="cadetName">Cadet Name</label>
+            <p class="field-example">Example: Jane Q. Cadet</p>
             <input id="cadetName" value="Hanniah Beacham" />
 
             <label for="cadetRank">Cadet Rank</label>
@@ -153,6 +157,7 @@
 
           <div id="awardFields" class="form-section hidden">
             <label for="awardCategory">Award Category</label>
+            <p class="field-example">Example: Cadet of the Year</p>
             <select id="awardCategory">
               <option value="Cadet of the Year" selected>Cadet of the Year</option>
               <option value="NCO of the Year">NCO of the Year</option>
@@ -181,24 +186,30 @@
             </p>
 
             <label for="awardRecipient">Recipient Name</label>
+            <p class="field-example">Example: Capt John Smith</p>
             <input id="awardRecipient" value="Hanniah Beacham" />
 
             <label for="awardSubtitle">Award Subtitle</label>
+            <p class="field-example">Example: For exceptional leadership and service</p>
             <input id="awardSubtitle" value="For exceptional leadership and service" />
           </div>
 
           <div id="activityFields" class="form-section hidden">
             <label for="activityName">Activity Name</label>
+            <p class="field-example">Example: Cadet Competition Encampment</p>
             <input id="activityName" value="Color Guard Competition" />
 
             <label for="activityRecipient">Recipient Name</label>
+            <p class="field-example">Example: C/TSgt Jane Q. Cadet</p>
             <input id="activityRecipient" value="Hanniah Beacham" />
 
             <label for="activitySubtitle">Award Subtitle</label>
+            <p class="field-example">Example: For outstanding participation</p>
             <input id="activitySubtitle" value="For exceptional leadership and service" />
           </div>
 
           <label id="promotionDateLabel" for="promotionDate">Date earned in eServices</label>
+          <p class="field-example">Example: 2026-04-27</p>
           <input id="promotionDate" type="date" />
 
           <label id="unitLineLabel" for="unitLine">Unit Line</label>
@@ -207,20 +218,26 @@
             (e.g., Squadron, City, State).
           </p>
           <input id="unitLine" value="Fort Worth Phoenix Composite Squadron, Fort Worth, Texas" />
+          <p class="field-example">Example: Fort Worth Composite Squadron, Fort Worth, Texas</p>
 
           <label for="leftSignerName">Left Signature Name</label>
+          <p class="field-example">Example: Capt Alex Rivera</p>
           <input id="leftSignerName" value="Joshua Bouldin" />
 
           <label for="leftSignerTitle">Left Signature Title</label>
+          <p class="field-example">Example: Squadron Commander</p>
           <input id="leftSignerTitle" value="Squadron Commander" placeholder="Squadron Commander" />
 
           <label for="rightSignerName">Right Signature Name</label>
+          <p class="field-example">Example: Maj Taylor Brooks</p>
           <input id="rightSignerName" value="Eric Erwin" />
 
           <label for="rightSignerTitle">Right Signature Title</label>
+          <p class="field-example">Example: Deputy Commander for Cadets</p>
           <input id="rightSignerTitle" value="Deputy Commander" placeholder="Deputy Commander" />
 
           <label for="exportFormat">Export Format</label>
+          <p class="field-example">Example: PDF (standard)</p>
           <select id="exportFormat">
             <option value="pdf" selected>PDF (standard)</option>
             <option value="pdf-print">PDF (print quality)</option>
@@ -229,6 +246,8 @@
 
           <div class="button-row">
             <button id="downloadBtn" type="button">Download</button>
+            <button id="printTestBtn" type="button" class="button-secondary">Print Test Page</button>
+            <button id="resetBtn" type="button" class="button-danger">Clear / Reset</button>
           </div>
           <div class="bulk-tools" aria-label="Bulk certificate generation">
             <h3>Bulk CSV Generation</h3>
@@ -289,6 +308,23 @@
 
     </section>
   </main>
+
+  <div id="disclaimerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="disclaimerTitle">
+    <div class="modal__backdrop" id="closeDisclaimerBackdrop"></div>
+    <div class="modal__content">
+      <h2 id="disclaimerTitle">CAP Usage Disclaimer</h2>
+      <p>
+        This tool is intended for local recognition use only (unit-level promotions, activities, and internal awards).
+      </p>
+      <p>
+        Do not use this generator for official CAP milestone awards such as the Wright Brothers, Mitchell, Eaker, or Spaatz.
+        Official milestone certificates and awards are processed through CAP’s official channels and mailed through command.
+      </p>
+      <div class="button-row">
+        <button id="closeDisclaimerBtn" type="button">I Understand</button>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
