@@ -1,97 +1,104 @@
 # CAP Certificate Generator
 
-A lightweight web app for creating **Civil Air Patrol cadet achievement certificates**. The tool provides a guided form, a live visual preview, and one-click PDF export based on the project certificate template.
+A lightweight browser app for creating **Civil Air Patrol cadet achievement certificates** with a guided form, live certificate preview, and one-click PDF export.
 
-## Features
+## What This App Does
 
-- Achievement selector with auto-filled:
+- Lets you select a cadet achievement and auto-fills:
   - Achievement title
   - Cadet rank
   - Rank insignia image
-- Live certificate preview that updates as fields change
-- Automatic date formatting with ordinal day output (for example, `10th Day of January 2026`)
-- PDF generation in-browser using [`pdf-lib`](https://pdf-lib.js.org/)
-- Downloadable certificate file named from the cadet's name
+- Updates the on-screen certificate preview as you type
+- Formats dates with ordinal day text (example: `10th Day of January 2026`)
+- Exports a finished certificate PDF directly in the browser using [`pdf-lib`](https://pdf-lib.js.org/)
+- Names the downloaded file from the cadet name (example: `jane-doe-certificate.pdf`)
 
-## Project Structure
+## Tech Stack
+
+- Plain HTML, CSS, and JavaScript (no build pipeline)
+- [`pdf-lib`](https://pdf-lib.js.org/) loaded from CDN in `index.html`
+- Static certificate assets (`template.pdf`, `template-preview.png`, rank images)
+
+## Repository Layout
 
 ```text
 .
-├── index.html             # App UI structure and form fields
-├── styles.css             # App styling and certificate preview layout
-├── script.js              # Form sync, live preview, and PDF generation logic
+├── index.html             # App UI and form fields
+├── styles.css             # Layout, form styling, and preview styling
+├── script.js              # Form sync, date formatting, and PDF generation
 ├── template.pdf           # Base PDF template used for export
 ├── template-preview.png   # Background image used in live preview
-├── ranks/                 # Rank insignia images keyed by achievement
-└── images/                # Supporting image assets (if used)
+├── ranks/                 # Rank insignia images mapped by achievement
+└── images/                # Supporting image assets
 ```
 
 ## Requirements
 
-- Modern browser (Chrome, Edge, Firefox, Safari)
-- No build tools or package install required
-- Internet access for loading `pdf-lib` from CDN in `index.html`
+- A modern browser (Chrome, Edge, Firefox, Safari)
+- A local web server (recommended; see below)
+- Internet access (for CDN-hosted `pdf-lib`)
 
-## Run Locally
+## Quick Start
 
-Because this project fetches local assets (`template.pdf`, rank images), run it from a local web server.
+Because the app loads local files (PDF and image assets), run it with a local server.
 
-### Option 1: Python
+### Option 1: Python HTTP Server
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open:
-
-```text
-http://localhost:8000
-```
+Open: <http://localhost:8000>
 
 ### Option 2: VS Code Live Server
 
-- Open the repository in VS Code
-- Use **"Open with Live Server"** on `index.html`
+1. Open the repository in VS Code.
+2. Right-click `index.html`.
+3. Select **Open with Live Server**.
 
-## How to Use
+## Usage Flow
 
-1. Select the achievement.
-2. Verify auto-filled achievement title and cadet rank.
-3. Enter or update cadet details:
+1. Select an achievement.
+2. Confirm auto-filled achievement title and cadet rank.
+3. Enter/edit certificate details:
    - Cadet name
    - Promotion date
    - Unit line
-   - Signature names and titles
-4. Review the live preview.
+   - Signature names and signature titles
+4. Review live preview content and spacing.
 5. Click **Download PDF**.
 
-The output file name is generated from the cadet name (for example, `jane-doe-certificate.pdf`).
+## Development Notes
 
-## Implementation Notes
+- All form-to-preview and export logic lives in `script.js`.
+- If a promotion date is not set, today’s date is used by default.
+- PDF text and image placement are controlled with percentage-based coordinates.
+- Rank insignia mapping is maintained in `RANK_IMAGE_MAP`.
 
-- `script.js` controls all form-to-preview synchronization.
-- Promotion date defaults to the current date if no value is set.
-- PDF text placement is based on percentage-driven coordinates to align with the template.
-- Rank insignia images are mapped by achievement in `RANK_IMAGE_MAP`.
+## Customization Guide
 
-## Customization
+To adapt this for another unit or certificate style:
 
-You can adapt this tool for different units or certificate styles by editing:
+- **`index.html`**: change defaults, labels, and selectable achievements
+- **`script.js`**: update field behavior, mapping, and PDF placement
+- **`styles.css`**: adjust UI and preview styling
+- **`template.pdf` / `template-preview.png`**: replace certificate artwork
 
-- `index.html` for default values and form options
-- `script.js` for mapping, text behavior, and PDF placement
-- `styles.css` for visual styling and preview layout
-- `template.pdf` and `template-preview.png` for certificate design changes
+## Update Checklist
 
-## Maintenance Checklist
+When changing achievements or assets:
 
-When updating achievements or templates:
+- Verify each achievement option has the correct `data-title` and `data-rank`.
+- Confirm each achievement key points to the intended rank image.
+- Test preview alignment and text wrapping with long names/titles.
+- Export several sample PDFs and verify visual placement in a PDF viewer.
 
-- Verify each achievement option has the correct `data-title` and `data-rank`
-- Confirm each achievement key maps to the intended rank image file
-- Test the live preview for alignment and spacing
-- Export sample PDFs and visually verify layout accuracy
+## Troubleshooting
 
-## License / Usage
+- **Blank or missing preview images:** ensure you are running from a local server, not opening `index.html` directly via `file://`.
+- **PDF export does not start:** check browser console for asset loading errors.
+- **Wrong rank image appears:** verify the achievement key in the selector matches `RANK_IMAGE_MAP` in `script.js`.
 
-This repository currently does not declare a formal license. Add a `LICENSE` file if redistribution or external contribution terms are needed.
+## License
+
+No formal license is currently declared. Add a `LICENSE` file before redistribution or external contribution.
