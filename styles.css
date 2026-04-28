@@ -388,6 +388,9 @@ button:hover {
   transform: translateX(-50%);
   font-size: clamp(10px, 1.2vw, 15px);
   color: #222;
+  width: 19%;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 /* ------------------ TABLET ------------------ */
