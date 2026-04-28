@@ -39,6 +39,16 @@ const RANK_IMAGE_MAP = Object.freeze({
   "ACHIEVEMENT 16": "ranks/A16.jpg"
 });
 
+const RIBBON_IMAGE_MAP = Object.freeze({
+  "ACHIEVEMENT 2": "images/arnold.png",
+  "ACHIEVEMENT 3": "images/feik.png",
+  "ACHIEVEMENT 4": "images/ricken.png",
+  "ACHIEVEMENT 5": "images/lindbe.png",
+  "ACHIEVEMENT 6": "images/doolit.png",
+  "ACHIEVEMENT 7": "images/goddar.png",
+  "ACHIEVEMENT 8": "images/armstr.png"
+});
+
 const CSV_FIELDS = Object.freeze({
   promotion: [
     "achievementNumber",
@@ -202,6 +212,10 @@ function getRankImage(achievementNumber) {
   return RANK_IMAGE_MAP[achievementNumber] || null;
 }
 
+function getRibbonImage(achievementNumber) {
+  return RIBBON_IMAGE_MAP[achievementNumber] || null;
+}
+
 function resolvePromotionFields(formValues) {
   const achievementSelect = byId("achievementNumber");
   const option = achievementSelect
@@ -277,17 +291,26 @@ function setPreviewText(formValues) {
 
 function setPreviewRankImage(achievementNumber) {
   const rankImage = byId("previewRankImage");
-  if (!rankImage) return;
+  const ribbonImage = byId("previewRibbonImage");
+  if (!rankImage || !ribbonImage) return;
 
-  const imagePath = getRankImage(achievementNumber);
-  if (imagePath) {
-    rankImage.src = imagePath;
+  const rankImagePath = getRankImage(achievementNumber);
+  if (rankImagePath) {
+    rankImage.src = rankImagePath;
     rankImage.style.display = "block";
-    return;
+  } else {
+    rankImage.removeAttribute("src");
+    rankImage.style.display = "none";
   }
 
-  rankImage.removeAttribute("src");
-  rankImage.style.display = "none";
+  const ribbonImagePath = getRibbonImage(achievementNumber);
+  if (ribbonImagePath) {
+    ribbonImage.src = ribbonImagePath;
+    ribbonImage.style.display = "block";
+  } else {
+    ribbonImage.removeAttribute("src");
+    ribbonImage.style.display = "none";
+  }
 }
 
 function updatePreview() {
@@ -612,6 +635,21 @@ async function generatePDFBytes(values) {
     });
   }
 
+  const ribbonImagePath = isPromotion ? getRibbonImage(formValues.achievementNumber) : null;
+  if (ribbonImagePath) {
+    const imgBytes = await fetch(ribbonImagePath).then((res) => res.arrayBuffer());
+    const img = ribbonImagePath.toLowerCase().endsWith(".png") ? await pdfDoc.embedPng(imgBytes) : await pdfDoc.embedJpg(imgBytes);
+    const imgWidth = 95;
+    const imgHeight = (img.height / img.width) * imgWidth;
+
+    page.drawImage(img, {
+      x: (width * 0.305) - (imgWidth / 2),
+      y: (height * 0.49) - (imgHeight / 2),
+      width: imgWidth,
+      height: imgHeight
+    });
+  }
+
   const presentationLine = isPromotion
     ? `Proudly Presented on this ${formatDate(formValues.promotionDate)}`
     : `Recognized on this ${formatDate(formValues.promotionDate)}`;
@@ -710,6 +748,21 @@ async function generatePrintQualityPDFBytes(values) {
     const imgHeight = (img.height / img.width) * imgWidth;
     page.drawImage(img, {
       x: (width * 0.22) - (imgWidth / 2),
+      y: (height * 0.49) - (imgHeight / 2),
+      width: imgWidth,
+      height: imgHeight
+    });
+  }
+
+  const ribbonImagePath = isPromotion ? getRibbonImage(formValues.achievementNumber) : null;
+  if (ribbonImagePath) {
+    const imgBytes = await fetch(ribbonImagePath).then((res) => res.arrayBuffer());
+    const img = ribbonImagePath.toLowerCase().endsWith(".png") ? await pdfDoc.embedPng(imgBytes) : await pdfDoc.embedJpg(imgBytes);
+    const imgWidth = 95;
+    const imgHeight = (img.height / img.width) * imgWidth;
+
+    page.drawImage(img, {
+      x: (width * 0.305) - (imgWidth / 2),
       y: (height * 0.49) - (imgHeight / 2),
       width: imgWidth,
       height: imgHeight

@@ -343,6 +343,17 @@ button:hover {
   display: none;
 }
 
+.preview-ribbon-image {
+  position: absolute;
+  top: 50%;
+  left: 30.5%;
+  transform: translate(-50%, -50%);
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+  display: none;
+}
+
 .presented-line {
   top: 64.4%;
   font-size: clamp(10px, 1.45vw, 18px);
@@ -466,6 +477,12 @@ button:hover {
     top: 50%;
   }
 
+  .preview-ribbon-image {
+    height: 70px;
+    left: 30.5%;
+    top: 50%;
+  }
+
   .achievement-number {
     font-size: 24px;
   }
@@ -530,6 +547,10 @@ button:hover {
   }
 
   .preview-rank-image {
+    height: 60px;
+  }
+
+  .preview-ribbon-image {
     height: 60px;
   }
 }
