@@ -85,7 +85,7 @@ const BLOCKED_TERMS = Object.freeze([
   "dumbass", "dumbasses",
   "fuck", "fucks", "fucked", "fucking", "fucker", "fuckers", "fuckface", "fuckhead", "fuckwit", "fuckup", "fuckboy",
   "shit", "shits", "shitted", "shitting", "shitty", "shithead", "shitface", "shitbag", "shitshow", "shitstorm", "shitfaced",
-  "piss", "pissed", "pissing", "pisser", "pisshead",
+  "piss", "pissed", "pissing", "pisser", "pisshead", "pussy", 
   "dick", "dicks", "dickhead", "dickbag", "dickface",
   "prick", "pricks",
   "jerk", "jerks",
