@@ -16,7 +16,7 @@ const DEFAULTS = Object.freeze({
   leftSignerName: "Roman Vitanza",
   leftSignerTitle: "Squadron Commander",
   rightSignerName: "Joshua Bouldin",
-  rightSignerTitle: "Deputy Commander for Cadets"
+  rightSignerTitle: "Deputy Commander For Cadets"
 });
 
 const DEFAULT_EXPORT_FORMAT = "pdf";
@@ -582,6 +582,11 @@ async function generatePDFBytes(values) {
     });
   }
 
+  function drawCenteredAtWrapped(text, centerPercentX, percentY, size, fontUsed, color = black, maxWidth = width * 0.25, lineHeightPercent = 0.02) {
+    const lines = splitTextIntoLines(text, maxWidth, size, fontUsed);
+    lines.forEach((line, index) => drawCenteredAt(line, centerPercentX, percentY + (index * lineHeightPercent), size, fontUsed, color));
+  }
+
   const certificateHeading = isPromotion ? formValues.achievementNumber : isAward ? formValues.awardCategory : formValues.activityName;
   const certificateTitle = isPromotion ? formValues.achievementTitle : "";
   const recipientName = isPromotion ? formValues.cadetName : isAward ? formValues.awardRecipient : formValues.activityRecipient;
@@ -617,7 +622,7 @@ async function generatePDFBytes(values) {
   drawCenteredAt(formValues.leftSignerName, 0.285, 0.874, 12, font);
   drawCenteredAt(formValues.leftSignerTitle, 0.285, 0.91, 10, font);
   drawCenteredAt(formValues.rightSignerName, 0.737, 0.874, 12, font);
-  drawCenteredAt(formValues.rightSignerTitle, 0.737, 0.91, 10, font);
+  drawCenteredAtWrapped(formValues.rightSignerTitle, 0.737, 0.91, 10, font, black, width * 0.18, 0.019);
 
   return pdfDoc.save({ useObjectStreams: true });
 }
@@ -682,6 +687,11 @@ async function generatePrintQualityPDFBytes(values) {
     });
   }
 
+  function drawCenteredAtWrapped(text, centerPercentX, percentY, size, fontUsed, color = black, maxWidth = width * 0.25, lineHeightPercent = 0.02) {
+    const lines = splitTextIntoLines(text, maxWidth, size, fontUsed);
+    lines.forEach((line, index) => drawCenteredAt(line, centerPercentX, percentY + (index * lineHeightPercent), size, fontUsed, color));
+  }
+
   const certificateHeading = isPromotion ? formValues.achievementNumber : isAward ? formValues.awardCategory : formValues.activityName;
   const certificateTitle = isPromotion ? formValues.achievementTitle : "";
   const recipientName = isPromotion ? formValues.cadetName : isAward ? formValues.awardRecipient : formValues.activityRecipient;
@@ -715,7 +725,7 @@ async function generatePrintQualityPDFBytes(values) {
   drawCenteredAt(formValues.leftSignerName, 0.285, 0.874, 12, font);
   drawCenteredAt(formValues.leftSignerTitle, 0.285, 0.91, 10, font);
   drawCenteredAt(formValues.rightSignerName, 0.737, 0.874, 12, font);
-  drawCenteredAt(formValues.rightSignerTitle, 0.737, 0.91, 10, font);
+  drawCenteredAtWrapped(formValues.rightSignerTitle, 0.737, 0.91, 10, font, black, width * 0.18, 0.019);
 
   return pdfDoc.save({ useObjectStreams: false, addDefaultPage: false });
 }
