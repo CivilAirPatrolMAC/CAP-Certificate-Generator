@@ -1,104 +1,143 @@
 # CAP Certificate Generator
 
-A lightweight browser app for creating **Civil Air Patrol cadet achievement certificates** with a guided form, live certificate preview, and one-click PDF export.
+A browser-based certificate builder for Civil Air Patrol units that supports **promotion certificates, annual/recognition awards, and activity certificates** with live preview, drag/scale positioning controls, and export options for PDF, PNG, and batch ZIP workflows.
 
-## What This App Does
+## Highlights
 
-- Lets you select a cadet achievement and auto-fills:
-  - Achievement title
-  - Cadet rank
-  - Rank insignia image
-- Updates the on-screen certificate preview as you type
-- Formats dates with ordinal day text (example: `10th Day of January 2026`)
-- Exports a finished certificate PDF directly in the browser using [`pdf-lib`](https://pdf-lib.js.org/)
-- Names the downloaded file from the cadet name (example: `jane-doe-certificate.pdf`)
+- Supports three certificate modes:
+  - **Cadet Promotion**
+  - **Of the Year Awards**
+  - **Activities**
+- Live WYSIWYG-style preview with:
+  - Form-driven text updates
+  - Achievement-specific rank insignia and ribbon graphics (promotion mode)
+  - Draggable preview elements for layout tuning
+  - Per-element preview scaling
+- Multiple export formats:
+  - Single certificate as **PDF**
+  - Single certificate as **PNG**
+  - **Bulk generation** from CSV (ZIP output)
+- Built-in content safeguards:
+  - CAP usage disclaimer modal
+  - Blocked-term profanity filter before export
+- Smart defaults and convenience behavior:
+  - Auto-populated fields
+  - Date defaults to today
+  - Auto-mapped achievement title/rank fields
+
+## Current Feature Set
+
+### 1) Certificate Type Workflows
+
+The `Certificate Type` selector changes both form inputs and preview behavior.
+
+- **Promotion**
+  - Achievement selector (Achievement 2–16)
+  - Auto-fills achievement title and cadet rank from selected option metadata
+  - Uses mapped rank insignia image (`ranks/`) and ribbon image (`images/`)
+
+- **Award**
+  - Large curated list of “Of the Year” award categories
+  - Recipient and subtitle fields tailored for recognition certificates
+
+- **Activities**
+  - Activity name, recipient, and subtitle inputs
+  - Same output pipeline as awards with activity-specific wording
+
+### 2) Preview System
+
+- Preview content updates as users edit the form.
+- Preview includes achievement/title/name/rank/unit/date/signers and visual assets.
+- Core preview nodes are configurable via internal mapping (`PREVIEW_MAP`).
+- A set of draggable/scalable nodes (`PREVIEW_DRAGGABLE_IDS`) can be moved and resized for visual alignment.
+
+### 3) Export Options
+
+- **PDF Export**
+  - Uses `pdf-lib` and `template.pdf`
+  - Renders text and placement from current form values and adjusted offsets
+
+- **PNG Export**
+  - Uses `html2canvas` to capture rendered preview
+
+- **Bulk ZIP Export**
+  - Uses `JSZip`
+  - CSV-driven generation for promotion and activities field sets
+
+### 4) Data Validation & Safety
+
+- Blocked-term list is compiled into `BLOCKED_TERMS_REGEX` and checked prior to output.
+- Includes a guidance checklist that updates by certificate type.
+- Includes a disclaimer flow for correct CAP usage context.
 
 ## Tech Stack
 
-- Plain HTML, CSS, and JavaScript (no build pipeline)
-- [`pdf-lib`](https://pdf-lib.js.org/) loaded from CDN in `index.html`
-- Static certificate assets (`template.pdf`, `template-preview.png`, rank images)
+- **HTML/CSS/Vanilla JavaScript** (no framework/build pipeline)
+- External browser libraries loaded via CDN in `index.html`:
+  - [`pdf-lib`](https://pdf-lib.js.org/) for PDF generation
+  - [`JSZip`](https://stuk.github.io/jszip/) for ZIP packaging
+  - [`html2canvas`](https://html2canvas.hertzen.com/) for PNG capture
 
 ## Repository Layout
 
 ```text
 .
-├── index.html             # App UI and form fields
-├── styles.css             # Layout, form styling, and preview styling
-├── script.js              # Form sync, date formatting, and PDF generation
-├── template.pdf           # Base PDF template used for export
-├── template-preview.png   # Background image used in live preview
-├── ranks/                 # Rank insignia images mapped by achievement
-└── images/                # Supporting image assets
+├── index.html             # App structure, form controls, preview shell, modals
+├── styles.css             # UI layout, form styles, preview styling, modal styling
+├── script.js              # App logic, field sync, preview controls, validation, exports
+├── template.pdf           # Source certificate PDF used for PDF generation
+├── template-preview.png   # Preview background artwork
+├── favicon.png            # Browser favicon
+├── ranks/                 # Rank insignia images (A2-A16)
+└── images/                # Ribbon/supporting images for achievements
 ```
 
-## Requirements
+## Getting Started
 
-- A modern browser (Chrome, Edge, Firefox, Safari)
-- A local web server (recommended; see below)
-- Internet access (for CDN-hosted `pdf-lib`)
+Because this app loads local PDF/image assets, use a local web server instead of opening `index.html` with `file://`.
 
-## Quick Start
-
-Because the app loads local files (PDF and image assets), run it with a local server.
-
-### Option 1: Python HTTP Server
+### Option A: Python HTTP Server
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Open: <http://localhost:8000>
+Then open <http://localhost:8000>.
 
-### Option 2: VS Code Live Server
+### Option B: VS Code Live Server
 
-1. Open the repository in VS Code.
+1. Open this folder in VS Code.
 2. Right-click `index.html`.
-3. Select **Open with Live Server**.
+3. Choose **Open with Live Server**.
 
-## Usage Flow
+## Usage
 
-1. Select an achievement.
-2. Confirm auto-filled achievement title and cadet rank.
-3. Enter/edit certificate details:
-   - Cadet name
-   - Promotion date
-   - Unit line
-   - Signature names and signature titles
-4. Review live preview content and spacing.
-5. Click **Download PDF**.
+1. Pick a **Certificate Type**.
+2. Fill in the displayed form fields.
+3. Confirm date/unit/signature lines.
+4. Adjust preview element positions/scales if needed.
+5. Select export format.
+6. Download a single file or run a bulk workflow (CSV → ZIP).
 
-## Development Notes
+## Configuration Notes for Maintainers
 
-- All form-to-preview and export logic lives in `script.js`.
-- If a promotion date is not set, today’s date is used by default.
-- PDF text and image placement are controlled with percentage-based coordinates.
-- Rank insignia mapping is maintained in `RANK_IMAGE_MAP`.
-
-## Customization Guide
-
-To adapt this for another unit or certificate style:
-
-- **`index.html`**: change defaults, labels, and selectable achievements
-- **`script.js`**: update field behavior, mapping, and PDF placement
-- **`styles.css`**: adjust UI and preview styling
-- **`template.pdf` / `template-preview.png`**: replace certificate artwork
-
-## Update Checklist
-
-When changing achievements or assets:
-
-- Verify each achievement option has the correct `data-title` and `data-rank`.
-- Confirm each achievement key points to the intended rank image.
-- Test preview alignment and text wrapping with long names/titles.
-- Export several sample PDFs and verify visual placement in a PDF viewer.
+- Default field seeds are in `DEFAULTS`.
+- Export default is controlled by `DEFAULT_EXPORT_FORMAT`.
+- Promotion imagery:
+  - Rank insignia paths live in `RANK_IMAGE_MAP`.
+  - Ribbon paths live in `RIBBON_IMAGE_MAP`.
+- CSV import field whitelists are in `CSV_FIELDS`.
+- Draggable preview IDs are listed in `PREVIEW_DRAGGABLE_IDS`.
+- Preview text node bindings are defined in `PREVIEW_MAP`.
+- Blocked terms live in `BLOCKED_TERMS` and compile to `BLOCKED_TERMS_REGEX`.
 
 ## Troubleshooting
 
-- **Blank or missing preview images:** ensure you are running from a local server, not opening `index.html` directly via `file://`.
-- **PDF export does not start:** check browser console for asset loading errors.
-- **Wrong rank image appears:** verify the achievement key in the selector matches `RANK_IMAGE_MAP` in `script.js`.
+- **Images/PDF not loading:** run from a local server (`http://localhost`) rather than `file://`.
+- **PDF export fails:** check browser console/network tab for missing assets or CDN failures.
+- **No ZIP output in bulk mode:** verify CSV headers match required `CSV_FIELDS` keys for selected type.
+- **Wrong rank/ribbon image:** verify achievement key strings match map keys exactly.
 
 ## License
 
-No formal license is currently declared. Add a `LICENSE` file before redistribution or external contribution.
+No formal license is currently declared in this repository. Add a `LICENSE` file before redistribution or external contribution.
