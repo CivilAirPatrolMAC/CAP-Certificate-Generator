@@ -73,6 +73,26 @@ const CSV_FIELDS = Object.freeze({
   ]
 });
 
+
+const PREVIEW_DRAGGABLE_IDS = Object.freeze([
+  "previewAchievementNumber",
+  "previewAchievementTitle",
+  "previewCadetName",
+  "previewCadetRank",
+  "previewPresentedLine",
+  "previewUnitLine",
+  "previewLeftSignerName",
+  "previewLeftSignerTitle",
+  "previewRightSignerName",
+  "previewRightSignerTitle",
+  "previewRankImage",
+  "previewRibbonImage"
+]);
+
+const previewDragOffsets = new Map();
+const previewElementScales = new Map();
+const DEFAULT_PREVIEW_SCALE = 1;
+
 const PREVIEW_MAP = Object.freeze({
   achievementNumber: "previewAchievementNumber",
   achievementTitle: "previewAchievementTitle",
@@ -166,6 +186,18 @@ function getFormValues() {
   };
 }
 
+function resetPreviewAdjustments() {
+  PREVIEW_DRAGGABLE_IDS.forEach((id) => {
+    previewDragOffsets.set(id, { x: 0, y: 0 });
+    previewElementScales.set(id, DEFAULT_PREVIEW_SCALE);
+    const el = byId(id);
+    if (el) {
+      applyPreviewDragOffset(el);
+      applyPreviewScale(el);
+    }
+  });
+}
+
 function applyDefaultValues() {
   Object.entries(DEFAULTS).forEach(([id, value]) => {
     const el = byId(id);
@@ -186,6 +218,7 @@ function applyDefaultValues() {
 
   syncAchievementFields();
   syncCertificateTypeFields();
+  resetPreviewAdjustments();
   updatePreview();
 }
 
@@ -844,20 +877,7 @@ function getRecipientName(formValues) {
 }
 
 async function generatePNG(formValues) {
-  if (!window.html2canvas) {
-    throw new Error("PNG export requires html2canvas.");
-  }
-
-  const previewNode = document.querySelector(".certificate-preview");
-  if (!previewNode) {
-    throw new Error("Preview container missing.");
-  }
-
-  const canvas = await window.html2canvas(previewNode, {
-    backgroundColor: "#ffffff",
-    scale: 3,
-    useCORS: true
-  });
+  const canvas = await renderPreviewCanvas(3);
 
   const fileName = `${sanitizeFileName(getRecipientName(formValues))}-certificate.png`;
   triggerDataUrlDownload(canvas.toDataURL("image/png"), fileName);
@@ -874,8 +894,8 @@ async function generateExport() {
     }
 
     const finalBytes = exportFormat === "pdf-print"
-      ? await generatePrintQualityPDFBytes(formValues)
-      : await generatePDFBytes(formValues);
+      ? await generatePreviewPDFBytes(4)
+      : await generatePreviewPDFBytes(3);
 
     triggerDownload(new Blob([finalBytes], { type: "application/pdf" }), `${sanitizeFileName(getRecipientName(formValues))}-certificate.pdf`);
   } catch (error) {
@@ -964,6 +984,111 @@ async function handleBulkUpload(file) {
   }
 }
 
+
+function applyPreviewDragOffset(el) {
+  const offset = previewDragOffsets.get(el.id) || { x: 0, y: 0 };
+  el.style.setProperty("--drag-x", `${offset.x}px`);
+  el.style.setProperty("--drag-y", `${offset.y}px`);
+}
+
+function applyPreviewScale(el) {
+  const scale = previewElementScales.get(el.id) || DEFAULT_PREVIEW_SCALE;
+  el.style.setProperty("--drag-scale", String(scale));
+}
+
+function adjustPreviewScale(el, delta) {
+  const current = previewElementScales.get(el.id) || DEFAULT_PREVIEW_SCALE;
+  const next = Math.max(0.5, Math.min(2.5, Math.round((current + delta) * 100) / 100));
+  previewElementScales.set(el.id, next);
+  applyPreviewScale(el);
+}
+
+function bindPreviewDrag() {
+  PREVIEW_DRAGGABLE_IDS.forEach((id) => {
+    const el = byId(id);
+    if (!el) return;
+
+    el.classList.add("preview-draggable");
+    applyPreviewDragOffset(el);
+    applyPreviewScale(el);
+
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let originX = 0;
+    let originY = 0;
+
+    el.addEventListener("pointerdown", (event) => {
+      pointerId = event.pointerId;
+      startX = event.clientX;
+      startY = event.clientY;
+      const current = previewDragOffsets.get(id) || { x: 0, y: 0 };
+      originX = current.x;
+      originY = current.y;
+      el.setPointerCapture(pointerId);
+      el.classList.add("is-dragging");
+      event.preventDefault();
+    });
+
+    el.addEventListener("pointermove", (event) => {
+      if (pointerId !== event.pointerId) return;
+      const next = {
+        x: originX + (event.clientX - startX),
+        y: originY + (event.clientY - startY)
+      };
+      previewDragOffsets.set(id, next);
+      applyPreviewDragOffset(el);
+    });
+
+    const stopDrag = (event) => {
+      if (pointerId !== event.pointerId) return;
+      pointerId = null;
+      el.classList.remove("is-dragging");
+    };
+
+    el.addEventListener("pointerup", stopDrag);
+    el.addEventListener("pointercancel", stopDrag);
+
+    el.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const delta = event.deltaY < 0 ? 0.03 : -0.03;
+      adjustPreviewScale(el, delta);
+    }, { passive: false });
+
+    el.addEventListener("dblclick", () => {
+      previewElementScales.set(id, DEFAULT_PREVIEW_SCALE);
+      applyPreviewScale(el);
+    });
+  });
+}
+
+async function renderPreviewCanvas(scale = 3) {
+  if (!window.html2canvas) {
+    throw new Error("Export requires html2canvas.");
+  }
+
+  const previewNode = document.querySelector(".certificate-preview");
+  if (!previewNode) {
+    throw new Error("Preview container missing.");
+  }
+
+  return window.html2canvas(previewNode, {
+    backgroundColor: "#ffffff",
+    scale,
+    useCORS: true
+  });
+}
+
+async function generatePreviewPDFBytes(scale = 3) {
+  const canvas = await renderPreviewCanvas(scale);
+  const imageData = canvas.toDataURL("image/png");
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([792, 612]);
+  const image = await pdfDoc.embedPng(imageData);
+  page.drawImage(image, { x: 0, y: 0, width: 792, height: 612 });
+  return pdfDoc.save({ useObjectStreams: true });
+}
+
 function bindFormEvents() {
   document.querySelectorAll("input, select").forEach((el) => {
     const handler = () => {
@@ -1012,9 +1137,11 @@ function initialize() {
   initializePromotionDate();
   bindFormEvents();
   bindBulkEvents();
+  bindPreviewDrag();
   byId("downloadBtn")?.addEventListener("click", generateExport);
   byId("printTestBtn")?.addEventListener("click", generatePrintTestPage);
   byId("resetBtn")?.addEventListener("click", applyDefaultValues);
+  byId("resetLayoutBtn")?.addEventListener("click", resetPreviewAdjustments);
   byId("openDisclaimerBtn")?.addEventListener("click", openDisclaimer);
   byId("closeDisclaimerBtn")?.addEventListener("click", closeDisclaimer);
   byId("closeDisclaimerBackdrop")?.addEventListener("click", closeDisclaimer);
