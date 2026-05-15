@@ -90,6 +90,8 @@ const PREVIEW_DRAGGABLE_IDS = Object.freeze([
 ]);
 
 const previewDragOffsets = new Map();
+const previewElementScales = new Map();
+const DEFAULT_PREVIEW_SCALE = 1;
 
 const PREVIEW_MAP = Object.freeze({
   achievementNumber: "previewAchievementNumber",
@@ -204,6 +206,15 @@ function applyDefaultValues() {
 
   syncAchievementFields();
   syncCertificateTypeFields();
+  PREVIEW_DRAGGABLE_IDS.forEach((id) => {
+    previewDragOffsets.set(id, { x: 0, y: 0 });
+    previewElementScales.set(id, DEFAULT_PREVIEW_SCALE);
+    const el = byId(id);
+    if (el) {
+      applyPreviewDragOffset(el);
+      applyPreviewScale(el);
+    }
+  });
   updatePreview();
 }
 
@@ -976,6 +987,18 @@ function applyPreviewDragOffset(el) {
   el.style.setProperty("--drag-y", `${offset.y}px`);
 }
 
+function applyPreviewScale(el) {
+  const scale = previewElementScales.get(el.id) || DEFAULT_PREVIEW_SCALE;
+  el.style.setProperty("--drag-scale", String(scale));
+}
+
+function adjustPreviewScale(el, delta) {
+  const current = previewElementScales.get(el.id) || DEFAULT_PREVIEW_SCALE;
+  const next = Math.max(0.5, Math.min(2.5, Math.round((current + delta) * 100) / 100));
+  previewElementScales.set(el.id, next);
+  applyPreviewScale(el);
+}
+
 function bindPreviewDrag() {
   PREVIEW_DRAGGABLE_IDS.forEach((id) => {
     const el = byId(id);
@@ -983,6 +1006,7 @@ function bindPreviewDrag() {
 
     el.classList.add("preview-draggable");
     applyPreviewDragOffset(el);
+    applyPreviewScale(el);
 
     let pointerId = null;
     let startX = 0;
@@ -1020,6 +1044,17 @@ function bindPreviewDrag() {
 
     el.addEventListener("pointerup", stopDrag);
     el.addEventListener("pointercancel", stopDrag);
+
+    el.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const delta = event.deltaY < 0 ? 0.03 : -0.03;
+      adjustPreviewScale(el, delta);
+    }, { passive: false });
+
+    el.addEventListener("dblclick", () => {
+      previewElementScales.set(id, DEFAULT_PREVIEW_SCALE);
+      applyPreviewScale(el);
+    });
   });
 }
 

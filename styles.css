@@ -292,7 +292,7 @@ button:hover {
 .preview-text {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px));
+  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   text-align: center;
   color: #111;
   white-space: nowrap;
@@ -343,7 +343,7 @@ button:hover {
   position: absolute;
   top: 50%;
   left: 22%;
-  transform: translate(-50%, -50%) translate(var(--drag-x, 0px), var(--drag-y, 0px));
+  transform: translate(-50%, -50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   height: 90px;
   width: auto;
   object-fit: contain;
@@ -354,7 +354,7 @@ button:hover {
   position: absolute;
   top: 50%;
   left: 79%;
-  transform: translate(-50%, -50%) translate(var(--drag-x, 0px), var(--drag-y, 0px));
+  transform: translate(-50%, -50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   height: 37px;
   width: auto;
   object-fit: contain;
@@ -379,7 +379,7 @@ button:hover {
 .left-signer-name {
   left: 28.5%;
   top: 87.3%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   font-size: clamp(11px, 1.5vw, 18px);
   color: #111;
 }
@@ -387,7 +387,7 @@ button:hover {
 .left-signer-title {
   left: 28.5%;
   top: 91%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   font-size: clamp(10px, 1.2vw, 15px);
   color: #222;
 }
@@ -395,7 +395,7 @@ button:hover {
 .right-signer-name {
   left: 73.7%;
   top: 87.3%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   font-size: clamp(11px, 1.5vw, 18px);
   color: #111;
 }
@@ -414,7 +414,7 @@ button:hover {
 .right-signer-title {
   left: 73.7%;
   top: 91%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px)) scale(var(--drag-scale, 1));
   font-size: clamp(10px, 1.2vw, 15px);
   color: #222;
   width: 19%;
