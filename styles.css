@@ -292,7 +292,7 @@ button:hover {
 .preview-text {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translate(var(--drag-x, 0px), var(--drag-y, 0px));
   text-align: center;
   color: #111;
   white-space: nowrap;
@@ -343,7 +343,7 @@ button:hover {
   position: absolute;
   top: 50%;
   left: 22%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translate(var(--drag-x, 0px), var(--drag-y, 0px));
   height: 90px;
   width: auto;
   object-fit: contain;
@@ -354,7 +354,7 @@ button:hover {
   position: absolute;
   top: 50%;
   left: 79%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translate(var(--drag-x, 0px), var(--drag-y, 0px));
   height: 37px;
   width: auto;
   object-fit: contain;
@@ -398,6 +398,17 @@ button:hover {
   transform: translateX(-50%);
   font-size: clamp(11px, 1.5vw, 18px);
   color: #111;
+}
+
+
+.preview-draggable {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.preview-draggable.is-dragging {
+  cursor: grabbing;
 }
 
 .right-signer-title {
