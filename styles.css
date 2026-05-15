@@ -264,6 +264,16 @@ button:hover {
 
 /* ------------------ PREVIEW ------------------ */
 
+
+.preview-actions {
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.preview-actions button {
+  width: auto;
+}
+
 .preview-frame {
   margin-top: 1rem;
   overflow: auto;

@@ -186,6 +186,18 @@ function getFormValues() {
   };
 }
 
+function resetPreviewAdjustments() {
+  PREVIEW_DRAGGABLE_IDS.forEach((id) => {
+    previewDragOffsets.set(id, { x: 0, y: 0 });
+    previewElementScales.set(id, DEFAULT_PREVIEW_SCALE);
+    const el = byId(id);
+    if (el) {
+      applyPreviewDragOffset(el);
+      applyPreviewScale(el);
+    }
+  });
+}
+
 function applyDefaultValues() {
   Object.entries(DEFAULTS).forEach(([id, value]) => {
     const el = byId(id);
@@ -206,15 +218,7 @@ function applyDefaultValues() {
 
   syncAchievementFields();
   syncCertificateTypeFields();
-  PREVIEW_DRAGGABLE_IDS.forEach((id) => {
-    previewDragOffsets.set(id, { x: 0, y: 0 });
-    previewElementScales.set(id, DEFAULT_PREVIEW_SCALE);
-    const el = byId(id);
-    if (el) {
-      applyPreviewDragOffset(el);
-      applyPreviewScale(el);
-    }
-  });
+  resetPreviewAdjustments();
   updatePreview();
 }
 
@@ -1137,6 +1141,7 @@ function initialize() {
   byId("downloadBtn")?.addEventListener("click", generateExport);
   byId("printTestBtn")?.addEventListener("click", generatePrintTestPage);
   byId("resetBtn")?.addEventListener("click", applyDefaultValues);
+  byId("resetLayoutBtn")?.addEventListener("click", resetPreviewAdjustments);
   byId("openDisclaimerBtn")?.addEventListener("click", openDisclaimer);
   byId("closeDisclaimerBtn")?.addEventListener("click", closeDisclaimer);
   byId("closeDisclaimerBackdrop")?.addEventListener("click", closeDisclaimer);
